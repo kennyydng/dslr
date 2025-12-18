@@ -191,8 +191,8 @@ def display_statistics(stats):
                 width = len(f"{value:.6f}")
             max_width = max(max_width, width)
         
-        # Ajouter 3 espaces de padding
-        col_widths[col] = max_width + 3
+        # Ajouter 2 espaces de padding
+        col_widths[col] = max_width + 2
     
     first_col_width = max(len(name) for name in stat_names) + 2
     
