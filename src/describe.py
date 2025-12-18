@@ -33,24 +33,44 @@ def read_csv(filepath):
         sys.exit(1)
 
 
+def shorten_column_name(name):
+    """Raccourcit les noms de colonnes trop longs"""
+    abbreviations = {
+        'Defense Against the Dark Arts': 'Defense',
+        'Muggle Studies': 'Muggle',
+        'Ancient Runes': 'Runes',
+        'History of Magic': 'History',
+        'Transfiguration': 'Transf.',
+        'Care of Magical Creatures': 'Creatures',
+        'First Name': 'Name'
+    }
+    return abbreviations.get(name, name)
+
+
 def extract_numeric_columns(headers, data):
     """Extrait les colonnes numériques du dataset"""
     numeric_data = {}
     
+    # Colonnes à exclure (identifiants, noms, etc.)
+    excluded_columns = {'Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand', 'Hogwarts House'}
+    
     for col_idx, header in enumerate(headers):
+        # Ignorer les colonnes non pertinentes
+        if header in excluded_columns:
+            continue
+            
         column_values = []
-        is_numeric = True
         
         for row in data:
             if col_idx < len(row):
                 value = parse_float(row[col_idx])
                 if value is not None:
                     column_values.append(value)
-            # Si toutes les valeurs sont None, ce n'est pas une colonne numérique
         
         # On considère une colonne comme numérique si elle contient au moins une valeur numérique
         if column_values:
-            numeric_data[header] = column_values
+            short_name = shorten_column_name(header)
+            numeric_data[short_name] = column_values
     
     return numeric_data
 
@@ -147,16 +167,32 @@ def display_statistics(stats):
     stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
     columns = list(stats.keys())
     
-    # Calculer la largeur de chaque colonne (ajusté pour mieux s'adapter)
-    col_width = 20
-    first_col_width = 12
+    # Calculer la largeur optimale pour chaque colonne
+    col_widths = {}
+    for col in columns:
+        # Largeur minimale = longueur du nom de la colonne
+        max_width = len(col)
+        
+        # Vérifier la largeur nécessaire pour chaque statistique
+        for stat_name in stat_names:
+            value = stats[col][stat_name]
+            if math.isnan(value):
+                width = 3  # "NaN"
+            elif stat_name == 'Count':
+                width = len(f"{value:.0f}")
+            else:
+                width = len(f"{value:.6f}")
+            max_width = max(max_width, width)
+        
+        # Ajouter 2 espaces de padding
+        col_widths[col] = max_width + 2
+    
+    first_col_width = max(len(name) for name in stat_names) + 2
     
     # En-tête
     header = ' ' * first_col_width
     for col in columns:
-        # Tronquer les noms trop longs
-        col_name = col[:col_width-1] if len(col) > col_width-1 else col
-        header += f"{col_name:>{col_width}}"
+        header += f"{col:>{col_widths[col]}}"
     print(header)
     
     # Lignes de statistiques
@@ -164,12 +200,13 @@ def display_statistics(stats):
         row = f"{stat_name:<{first_col_width}}"
         for col in columns:
             value = stats[col][stat_name]
+            width = col_widths[col]
             if math.isnan(value):
-                row += f"{'NaN':>{col_width}}"
+                row += f"{'NaN':>{width}}"
             elif stat_name == 'Count':
-                row += f"{value:>{col_width}.0f}"
+                row += f"{value:>{width}.0f}"
             else:
-                row += f"{value:>{col_width}.6f}"
+                row += f"{value:>{width}.6f}"
         print(row)
 
 
