@@ -35,16 +35,15 @@ def read_csv(filepath):
 
 def shorten_column_name(name):
     """Raccourcit les noms de colonnes trop longs"""
-    abbreviations = {
-        'Defense Against the Dark Arts': 'Defense',
-        'Muggle Studies': 'Muggle',
-        'Ancient Runes': 'Runes',
-        'History of Magic': 'History',
-        'Transfiguration': 'Transf.',
-        'Care of Magical Creatures': 'Creatures',
-        'First Name': 'Name'
+    # Garder les noms complets mais les diviser sur deux lignes si nécessaire
+    split_names = {
+        'Defense Against the Dark Arts': 'Defense Against\nthe Dark Arts',
+        'Care of Magical Creatures': 'Care of Magical\nCreatures',
+        'History of Magic': 'History of\nMagic',
+        'Muggle Studies': 'Muggle\nStudies',
+        'Ancient Runes': 'Ancient\nRunes'
     }
-    return abbreviations.get(name, name)
+    return split_names.get(name, name)
 
 
 def extract_numeric_columns(headers, data):
@@ -167,11 +166,19 @@ def display_statistics(stats):
     stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
     columns = list(stats.keys())
     
+    # Séparer les noms de colonnes en lignes
+    col_lines = []
+    max_lines = 1
+    for col in columns:
+        lines = col.split('\n')
+        col_lines.append(lines)
+        max_lines = max(max_lines, len(lines))
+    
     # Calculer la largeur optimale pour chaque colonne
     col_widths = {}
-    for col in columns:
-        # Largeur minimale = longueur du nom de la colonne
-        max_width = len(col)
+    for i, col in enumerate(columns):
+        # Largeur minimale = longueur max des lignes du nom
+        max_width = max(len(line) for line in col_lines[i])
         
         # Vérifier la largeur nécessaire pour chaque statistique
         for stat_name in stat_names:
@@ -184,16 +191,19 @@ def display_statistics(stats):
                 width = len(f"{value:.6f}")
             max_width = max(max_width, width)
         
-        # Ajouter 2 espaces de padding
-        col_widths[col] = max_width + 2
+        # Ajouter 3 espaces de padding
+        col_widths[col] = max_width + 3
     
     first_col_width = max(len(name) for name in stat_names) + 2
     
-    # En-tête
-    header = ' ' * first_col_width
-    for col in columns:
-        header += f"{col:>{col_widths[col]}}"
-    print(header)
+    # En-tête sur plusieurs lignes
+    for line_idx in range(max_lines):
+        header = ' ' * first_col_width
+        for i, col in enumerate(columns):
+            # Prendre la ligne correspondante ou une chaîne vide
+            line_text = col_lines[i][line_idx] if line_idx < len(col_lines[i]) else ''
+            header += f"{line_text:>{col_widths[col]}}"
+        print(header)
     
     # Lignes de statistiques
     for stat_name in stat_names:
