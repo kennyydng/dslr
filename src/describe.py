@@ -137,6 +137,54 @@ def percentile(values, p):
     return d0 + d1
 
 
+def range_value(values):
+    """Calcule l'étendue (range) = max - min"""
+    if not values:
+        return float('nan')
+    return max_value(values) - min_value(values)
+
+
+def iqr(values):
+    """Calcule l'écart interquartile (IQR) = Q3 - Q1"""
+    if not values:
+        return float('nan')
+    return percentile(values, 75) - percentile(values, 25)
+
+
+def skewness(values):
+    """Calcule le coefficient d'asymétrie (skewness)"""
+    if not values or len(values) < 3:
+        return float('nan')
+    
+    n = len(values)
+    mean_val = mean(values)
+    std_val = std(values)
+    
+    if std_val == 0 or math.isnan(std_val):
+        return float('nan')
+    
+    # Formule: E[((X - μ) / σ)³]
+    sum_cubed = sum(((x - mean_val) / std_val) ** 3 for x in values)
+    return sum_cubed / n
+
+
+def kurtosis(values):
+    """Calcule le coefficient d'aplatissement (kurtosis)"""
+    if not values or len(values) < 4:
+        return float('nan')
+    
+    n = len(values)
+    mean_val = mean(values)
+    std_val = std(values)
+    
+    if std_val == 0 or math.isnan(std_val):
+        return float('nan')
+    
+    # Formule: E[((X - μ) / σ)⁴] - 3 (excess kurtosis)
+    sum_fourth = sum(((x - mean_val) / std_val) ** 4 for x in values)
+    return (sum_fourth / n) - 3
+
+
 def calculate_statistics(numeric_data):
     """Calcule toutes les statistiques pour chaque colonne numérique"""
     stats = {}
@@ -150,7 +198,11 @@ def calculate_statistics(numeric_data):
             '25%': percentile(values, 25),
             '50%': percentile(values, 50),
             '75%': percentile(values, 75),
-            'Max': max_value(values)
+            'Max': max_value(values),
+            'Range': range_value(values),
+            'IQR': iqr(values),
+            'Skewness': skewness(values),
+            'Kurtosis': kurtosis(values)
         }
     
     return stats
@@ -163,7 +215,7 @@ def display_statistics(stats):
         return
     
     # Définir les lignes à afficher
-    stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
+    stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max', 'Range', 'IQR', 'Skewness', 'Kurtosis']
     columns = list(stats.keys())
     
     # Séparer les noms de colonnes en lignes
