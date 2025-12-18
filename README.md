@@ -127,12 +127,19 @@ Std       16674.479577   520.132330    5.218016         5.211132    4.153970    
 
 ## Scripts de visualisation
 
+**Note**: Si `python` ne fonctionne pas, utilisez `./venv/bin/python` ou `python3` à la place.
+
 ### histogram.py - Analyse d'homogénéité
 
 Affiche des histogrammes pour identifier le cours avec la distribution de scores la plus homogène entre les quatre maisons.
 
 ```bash
+# Méthode 1 (avec venv activé)
+source venv/bin/activate
 python src/histogram.py datasets/dataset_train.csv
+
+# Méthode 2 (chemin direct)
+./venv/bin/python src/histogram.py datasets/dataset_train.csv
 ```
 
 **Question** : Quel cours a une distribution de scores homogène entre toutes les maisons ?  
@@ -143,22 +150,27 @@ python src/histogram.py datasets/dataset_train.csv
 Affiche des scatter plots pour trouver les deux features les plus similaires (fortement corrélées).
 
 ```bash
-python src/scatter_plot.py datasets/dataset_train.csv
+./venv/bin/python src/scatter_plot.py datasets/dataset_train.csv
 ```
 
 **Question** : Quelles sont les deux features les plus similaires ?  
-**Réponse** : Le script identifie les paires avec la plus forte corrélation de Pearson.
+**Réponse** : Astronomy et Defense Against the Dark Arts (corrélation parfaite de 1.0)
 
 ### pair_plot.py - Sélection de features
 
 Affiche un pair plot et une matrice de corrélation pour aider à sélectionner les meilleures features pour la régression logistique.
 
 ```bash
-python src/pair_plot.py datasets/dataset_train.csv
+./venv/bin/python src/pair_plot.py datasets/dataset_train.csv
 ```
 
 **Question** : Quelles features utiliser pour la régression logistique ?  
-**Réponse** : Le script calcule le pouvoir discriminant de chaque feature et recommande les plus pertinentes.
+**Réponse** : Les 5 features les plus discriminantes sont :
+1. Defense Against the Dark Arts
+2. Astronomy
+3. Divination
+4. Charms
+5. Ancient Runes
 
 ### Implémentation
 
