@@ -6,6 +6,39 @@ Projet d'analyse de données et d'apprentissage automatique inspiré de l'univer
 
 Ce projet consiste à analyser un dataset contenant des informations sur les étudiants de Poudlard et à prédire leur maison d'appartenance en utilisant la régression logistique.
 
+## Installation
+
+### Prérequis
+- Python 3.9 ou supérieur
+- pip
+
+### Configuration de l'environnement virtuel
+
+```bash
+# Cloner le repository
+git clone https://github.com/kennyydng/dslr.git
+cd dslr
+
+# Créer un environnement virtuel
+python3 -m venv venv
+
+# Activer l'environnement virtuel
+# Sur macOS/Linux :
+source venv/bin/activate
+# Sur Windows :
+# venv\Scripts\activate
+
+# Installer les dépendances
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Dépendances
+- matplotlib >= 3.5.0 : Visualisation de données
+- numpy >= 1.21.0 : Calculs numériques
+- seaborn >= 0.12.0 : Visualisations statistiques avancées
+- pandas >= 1.3.0 : Manipulation de données (pour les visualisations uniquement)
+
 ## Dataset
 
 Le projet contient deux fichiers de données :
@@ -55,7 +88,11 @@ Le dataset contient les colonnes suivantes :
 ### Usage
 
 ```bash
-python describe.py <dataset.csv>
+# Avec l'environnement virtuel activé
+python src/describe.py <dataset.csv>
+
+# Exemple
+python src/describe.py datasets/dataset_train.csv
 ```
 
 ### Description
@@ -75,17 +112,53 @@ Les statistiques calculées sont :
 ### Exemple
 
 ```bash
-python describe.py datasets/dataset_train.csv
+python src/describe.py datasets/dataset_train.csv
 ```
 
 Sortie :
 ```
-            Arithmancy    Astronomy   Herbology     Defense  Divination        Muggle       Runes    History      Transf.    Potions  Creatures       Charms       Flying
-Count             1566         1568        1567        1569        1561          1565        1565       1557         1566       1570       1560         1600         1600
-Mean      49634.570243    39.797131    1.141020   -0.387863    3.153910   -224.589915  495.747970   2.963095  1030.096946   5.950373  -0.053427  -243.374409    21.958012
-Std       16674.479577   520.132330    5.218016    5.211132    4.153970    486.189433  106.251202   4.424353    44.111025   3.146852   0.971146     8.780895    97.601087
+            Arithmancy    Astronomy   Herbology  Defense Against  Divination        Muggle     Ancient  History of  Transfiguration    Potions  Care of Magical       Charms       Flying
+                                                   the Dark Arts                   Studies       Runes       Magic                                    Creatures                          
+Count             1566         1568        1567             1569        1561          1565        1565        1557             1566       1570             1560         1600         1600
+Mean      49634.570243    39.797131    1.141020        -0.387863    3.153910   -224.589915  495.747970    2.963095      1030.096946   5.950373        -0.053427  -243.374409    21.958012
+Std       16674.479577   520.132330    5.218016         5.211132    4.153970    486.189433  106.251202    4.424353        44.111025   3.146852         0.971146     8.780895    97.601087
 ...
 ```
+
+## Scripts de visualisation
+
+### histogram.py - Analyse d'homogénéité
+
+Affiche des histogrammes pour identifier le cours avec la distribution de scores la plus homogène entre les quatre maisons.
+
+```bash
+python src/histogram.py datasets/dataset_train.csv
+```
+
+**Question** : Quel cours a une distribution de scores homogène entre toutes les maisons ?  
+**Réponse** : Care of Magical Creatures
+
+### scatter_plot.py - Analyse de similarité
+
+Affiche des scatter plots pour trouver les deux features les plus similaires (fortement corrélées).
+
+```bash
+python src/scatter_plot.py datasets/dataset_train.csv
+```
+
+**Question** : Quelles sont les deux features les plus similaires ?  
+**Réponse** : Le script identifie les paires avec la plus forte corrélation de Pearson.
+
+### pair_plot.py - Sélection de features
+
+Affiche un pair plot et une matrice de corrélation pour aider à sélectionner les meilleures features pour la régression logistique.
+
+```bash
+python src/pair_plot.py datasets/dataset_train.csv
+```
+
+**Question** : Quelles features utiliser pour la régression logistique ?  
+**Réponse** : Le script calcule le pouvoir discriminant de chaque feature et recommande les plus pertinentes.
 
 ### Implémentation
 
