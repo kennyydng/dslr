@@ -7,9 +7,8 @@ en utilisant les modèles de régression logistique entraînés
 import sys
 import csv
 import json
-import math
 
-from utils import clamp, ft_length, argmax_dict, count_occurrences, ft_sum
+from utils import clamp, ft_length, argmax_dict, count_occurrences, ft_sum, ft_exp
 
 
 def parse_float(value):
@@ -53,7 +52,7 @@ def load_weights(filepath):
 def sigmoid(z):
     """Fonction sigmoïde"""
     z = clamp(z, -500, 500)
-    return 1.0 / (1.0 + math.exp(-z))
+    return 1.0 / (1.0 + ft_exp(-z))
 
 
 def predict_probability(X, weights):

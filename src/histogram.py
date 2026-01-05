@@ -13,9 +13,9 @@ from utils import (
     ft_length,
     ft_max,
     ft_min,
-    mean,
+    ft_mean,
     sort_pairs_by_value,
-    variance,
+    ft_variance,
 )
 
 
@@ -83,11 +83,11 @@ def calculate_homogeneity(course_data):
         means = []
         for house, scores in houses_scores.items():
             if scores:
-                means.append(mean(scores))
+                means.append(ft_mean(scores))
         
         if means:
             # Variance des moyennes (plus c'est faible, plus c'est homogène)
-            homogeneity_scores[course] = variance(means)
+            homogeneity_scores[course] = ft_variance(means)
     
     return homogeneity_scores
 
@@ -106,7 +106,7 @@ def plot_histograms(course_data, most_homogeneous):
     n_rows = (n_courses + n_cols - 1) // n_cols
     
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, 12))
-    fig.suptitle('Distribution des scores par cours et par maison', fontsize=16, y=0.995)
+    fig.suptitle('Distribution of Scores by Course and House', fontsize=16, y=0.995)
     
     # Aplatir les axes pour faciliter l'itération
     if n_rows == 1:
@@ -126,18 +126,18 @@ def plot_histograms(course_data, most_homogeneous):
             continue
         
         # Créer les bins
-            min_s = ft_min(all_scores)
-            max_s = ft_max(all_scores)
-            n_bins = 30
-            if max_s == min_s:
-                # Single-value fallback: create a small range.
-                max_s = min_s + 1.0
-            step = (max_s - min_s) / n_bins
-            bins = []
-            i = 0
-            while i <= n_bins:
-                bins.append(min_s + step * i)
-                i += 1
+        min_s = ft_min(all_scores)
+        max_s = ft_max(all_scores)
+        n_bins = 30
+        if max_s == min_s:
+            # Single-value fallback: create a small range.
+            max_s = min_s + 1.0
+        step = (max_s - min_s) / n_bins
+        bins = []
+        i = 0
+        while i <= n_bins:
+            bins.append(min_s + step * i)
+            i += 1
         
         # Tracer l'histogramme pour chaque maison
         for house, color in zip(houses, colors):
@@ -147,7 +147,7 @@ def plot_histograms(course_data, most_homogeneous):
         
         # Mettre en évidence le cours le plus homogène
         if course == most_homogeneous:
-            ax.set_title(f'{course}\n★ PLUS HOMOGÈNE ★', fontweight='bold', fontsize=10, color='red')
+            ax.set_title(f'{course}\n★ MOST HOMOGENEOUS ★', fontweight='bold', fontsize=10, color='red')
             ax.patch.set_edgecolor('red')
             ax.patch.set_linewidth(3)
         else:

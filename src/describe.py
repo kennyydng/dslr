@@ -9,7 +9,6 @@ import csv
 
 from utils import (
     ft_length,
-    ft_sum,
     ft_min,
     ft_max,
     merge_sort,
@@ -17,7 +16,6 @@ from utils import (
     is_nan,
     ft_floor,
     ft_ceil,
-    ft_sqrt,
     ft_mean,
     ft_variance,
     ft_std,

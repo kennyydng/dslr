@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 from utils import (
     ft_length,
-    mean,
-    variance,
+    ft_mean,
+    ft_variance,
     pearson_corr,
     sort_pairs_by_value,
     ft_min,
@@ -90,13 +90,13 @@ def analyze_feature_importance(data, features):
             vals = per_house_values[h]
             if ft_length(vals) == 0:
                 continue
-            m = mean(vals)
-            v = variance(vals, mean_val=m)
+            m = ft_mean(vals)
+            v = ft_variance(vals, mean_val=m)
             house_means.append(m)
             house_vars.append(v)
 
-        intra = mean(house_vars) if ft_length(house_vars) > 0 else 0.0
-        inter = variance(house_means) if ft_length(house_means) > 0 else 0.0
+        intra = ft_mean(house_vars) if ft_length(house_vars) > 0 else 0.0
+        inter = ft_variance(house_means) if ft_length(house_means) > 0 else 0.0
 
         score = (inter / intra) if intra > 0 else 0.0
         feature_scores[feat] = score
@@ -122,14 +122,14 @@ def plot_full_correlation_matrix(columns, features):
         matrix.append(row)
         i += 1
 
-    fig, ax = plt.subplots(figsize=(14, 12))
+    fig, ax = plt.subplots(figsize=(12, 10))
     im = ax.imshow(matrix, vmin=-1, vmax=1, cmap='coolwarm')
-    ax.set_title('Matrice de Corrélation - Toutes les Features', fontsize=16, pad=20)
+    ax.set_title('Matrice de Corrélation - Toutes les Features', fontsize=14, pad=15)
 
     ax.set_xticks(range(n))
     ax.set_yticks(range(n))
-    ax.set_xticklabels(features, rotation=90, fontsize=8)
-    ax.set_yticklabels(features, fontsize=8)
+    ax.set_xticklabels(features, rotation=90, fontsize=7, ha='right')
+    ax.set_yticklabels(features, fontsize=7)
 
     # Annotate values
     i = 0
@@ -158,8 +158,8 @@ def plot_pair_plot(data, top_features):
     columns, houses = build_columns(data, top_features)
     n = ft_length(top_features)
 
-    fig, axes = plt.subplots(n, n, figsize=(3 * n, 3 * n))
-    fig.suptitle('Pair Plot - Top Features (manual)', y=1.02, fontsize=16)
+    fig, axes = plt.subplots(n, n, figsize=(2.5 * n, 2.5 * n))
+    fig.suptitle('Pair Plot - Top Features (manual)', y=0.995, fontsize=14)
 
     i = 0
     while i < n:
@@ -178,8 +178,8 @@ def plot_pair_plot(data, top_features):
                         vals.append(v)
                 if ft_length(vals) > 0:
                     ax.hist(vals, bins=20, color='gray', alpha=0.7, edgecolor='black', linewidth=0.3)
-                ax.set_xlabel(feat_x, fontsize=8)
-                ax.set_ylabel('Freq', fontsize=8)
+                ax.set_xlabel(feat_x, fontsize=7)
+                ax.set_ylabel('Freq', fontsize=7)
             else:
                 # Off-diagonal: scatter by house
                 for house in HOUSES:
@@ -199,12 +199,12 @@ def plot_pair_plot(data, top_features):
                         ax.scatter(xs, ys, s=8, alpha=0.5, c=colors[house], label=house)
 
                 if i == 0 and j == n - 1:
-                    ax.legend(fontsize=7, loc='best')
+                    ax.legend(fontsize=6, loc='best')
 
-                ax.set_xlabel(feat_x, fontsize=8)
-                ax.set_ylabel(feat_y, fontsize=8)
+                ax.set_xlabel(feat_x, fontsize=7)
+                ax.set_ylabel(feat_y, fontsize=7)
 
-            ax.tick_params(labelsize=7)
+            ax.tick_params(labelsize=6)
             ax.grid(True, alpha=0.2)
             j += 1
         i += 1

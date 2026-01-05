@@ -7,9 +7,8 @@ pour prédire la maison de Poudlard des étudiants
 import sys
 import csv
 import json
-import math
 
-from utils import clamp, ft_length, ft_sum, mean, std, is_nan
+from utils import clamp, ft_length, ft_sum, ft_mean, ft_std, is_nan, ft_exp, ft_log
 
 
 def parse_float(value):
@@ -76,8 +75,8 @@ def normalize_features(X):
         for row in X:
             values.append(row[j])
 
-        m = mean(values)
-        s = std(values)
+        m = ft_mean(values)
+        s = ft_std(values)
         if is_nan(s) or s == 0.0:
             s = 1.0
 
@@ -101,7 +100,7 @@ def sigmoid(z):
     """Fonction sigmoïde"""
     # Clipper pour éviter l'overflow
     z = clamp(z, -500, 500)
-    return 1.0 / (1.0 + math.exp(-z))
+    return 1.0 / (1.0 + ft_exp(-z))
 
 
 def predict_probability(X, weights):
@@ -125,7 +124,7 @@ def compute_cost(X, y_binary, weights):
         h = predict_probability(X[i], weights)
         # Éviter log(0)
         h = clamp(h, 1e-15, 1 - 1e-15)
-        cost = -y_binary[i] * math.log(h) - (1 - y_binary[i]) * math.log(1 - h)
+        cost = -y_binary[i] * ft_log(h) - (1 - y_binary[i]) * ft_log(1 - h)
         total_cost += cost
     
     return total_cost / m
