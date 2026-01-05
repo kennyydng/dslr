@@ -6,7 +6,22 @@ Affiche les statistiques descriptives pour toutes les features numériques
 
 import sys
 import csv
-import math
+
+from utils import (
+    ft_length,
+    ft_sum,
+    ft_min,
+    ft_max,
+    merge_sort,
+    str_length,
+    is_nan,
+    ft_floor,
+    ft_ceil,
+    ft_sqrt,
+    ft_mean,
+    ft_variance,
+    ft_std,
+)
 
 
 def parse_float(value):
@@ -61,10 +76,14 @@ def extract_numeric_columns(headers, data):
         column_values = []
         
         for row in data:
-            if col_idx < len(row):
-                value = parse_float(row[col_idx])
-                if value is not None:
-                    column_values.append(value)
+            try:
+                raw = row[col_idx]
+            except IndexError:
+                continue
+
+            value = parse_float(raw)
+            if value is not None:
+                column_values.append(value)
         
         # On considère une colonne comme numérique si elle contient au moins une valeur numérique
         if column_values:
@@ -76,58 +95,46 @@ def extract_numeric_columns(headers, data):
 
 def count(values):
     """Compte le nombre de valeurs non-nulles"""
-    return len(values)
+    return ft_length(values)
 
 
 def mean(values):
     """Calcule la moyenne"""
-    if not values:
-        return float('nan')
-    return sum(values) / len(values)
+    return ft_mean(values)
 
 
 def variance(values, mean_val):
     """Calcule la variance"""
-    if not values:
-        return float('nan')
-    return sum((x - mean_val) ** 2 for x in values) / len(values)
+    return ft_variance(values, mean_val)
 
 
 def std(values):
     """Calcule l'écart-type"""
-    if not values:
-        return float('nan')
-    mean_val = mean(values)
-    var = variance(values, mean_val)
-    return math.sqrt(var)
+    return ft_std(values)
 
 
 def min_value(values):
     """Retourne la valeur minimale"""
-    if not values:
-        return float('nan')
-    return min(values)
+    return ft_min(values)
 
 
 def max_value(values):
     """Retourne la valeur maximale"""
-    if not values:
-        return float('nan')
-    return max(values)
+    return ft_max(values)
 
 
 def percentile(values, p):
     """Calcule le percentile p (0-100)"""
-    if not values:
+    if ft_length(values) == 0:
         return float('nan')
     
-    sorted_values = sorted(values)
-    n = len(sorted_values)
+    sorted_values = merge_sort(values)
+    n = ft_length(sorted_values)
     
     # Méthode linéaire d'interpolation
     k = (n - 1) * (p / 100.0)
-    f = math.floor(k)
-    c = math.ceil(k)
+    f = ft_floor(k)
+    c = ft_ceil(k)
     
     if f == c:
         return sorted_values[int(k)]
@@ -139,50 +146,56 @@ def percentile(values, p):
 
 def range_value(values):
     """Calcule l'étendue (range) = max - min"""
-    if not values:
+    if ft_length(values) == 0:
         return float('nan')
     return max_value(values) - min_value(values)
 
 
 def iqr(values):
     """Calcule l'écart interquartile (IQR) = Q3 - Q1"""
-    if not values:
+    if ft_length(values) == 0:
         return float('nan')
     return percentile(values, 75) - percentile(values, 25)
 
 
 def skewness(values):
     """Calcule le coefficient d'asymétrie (skewness)"""
-    if not values or len(values) < 3:
+    if ft_length(values) < 3:
         return float('nan')
     
-    n = len(values)
+    n = ft_length(values)
     mean_val = mean(values)
     std_val = std(values)
     
-    if std_val == 0 or math.isnan(std_val):
+    if std_val == 0 or is_nan(std_val):
         return float('nan')
     
     # Formule: E[((X - μ) / σ)³]
-    sum_cubed = sum(((x - mean_val) / std_val) ** 3 for x in values)
-    return sum_cubed / n
+    acc = 0.0
+    for x in values:
+        z = (x - mean_val) / std_val
+        acc += z * z * z
+    return acc / n
 
 
 def kurtosis(values):
     """Calcule le coefficient d'aplatissement (kurtosis)"""
-    if not values or len(values) < 4:
+    if ft_length(values) < 4:
         return float('nan')
     
-    n = len(values)
+    n = ft_length(values)
     mean_val = mean(values)
     std_val = std(values)
     
-    if std_val == 0 or math.isnan(std_val):
+    if std_val == 0 or is_nan(std_val):
         return float('nan')
     
     # Formule: E[((X - μ) / σ)⁴] - 3 (excess kurtosis)
-    sum_fourth = sum(((x - mean_val) / std_val) ** 4 for x in values)
-    return (sum_fourth / n) - 3
+    acc = 0.0
+    for x in values:
+        z = (x - mean_val) / std_val
+        acc += z * z * z * z
+    return (acc / n) - 3
 
 
 def calculate_statistics(numeric_data):
@@ -224,36 +237,48 @@ def display_statistics(stats):
     for col in columns:
         lines = col.split('\n')
         col_lines.append(lines)
-        max_lines = max(max_lines, len(lines))
+        lines_n = ft_length(lines)
+        if lines_n > max_lines:
+            max_lines = lines_n
     
     # Calculer la largeur optimale pour chaque colonne
     col_widths = {}
     for i, col in enumerate(columns):
         # Largeur minimale = longueur max des lignes du nom
-        max_width = max(len(line) for line in col_lines[i])
+        max_width = 0
+        for line in col_lines[i]:
+            w = str_length(line)
+            if w > max_width:
+                max_width = w
         
         # Vérifier la largeur nécessaire pour chaque statistique
         for stat_name in stat_names:
             value = stats[col][stat_name]
-            if math.isnan(value):
+            if is_nan(value):
                 width = 3  # "NaN"
             elif stat_name == 'Count':
-                width = len(f"{value:.0f}")
+                width = str_length(f"{value:.0f}")
             else:
-                width = len(f"{value:.6f}")
-            max_width = max(max_width, width)
+                width = str_length(f"{value:.6f}")
+            if width > max_width:
+                max_width = width
         
         # Ajouter 2 espaces de padding
         col_widths[col] = max_width + 2
     
-    first_col_width = max(len(name) for name in stat_names) + 2
+    first_col_width = 0
+    for name in stat_names:
+        w = str_length(name)
+        if w > first_col_width:
+            first_col_width = w
+    first_col_width += 2
     
     # En-tête sur plusieurs lignes
     for line_idx in range(max_lines):
         header = ' ' * first_col_width
         for i, col in enumerate(columns):
             # Prendre la ligne correspondante ou une chaîne vide
-            line_text = col_lines[i][line_idx] if line_idx < len(col_lines[i]) else ''
+            line_text = col_lines[i][line_idx] if line_idx < ft_length(col_lines[i]) else ''
             header += f"{line_text:>{col_widths[col]}}"
         print(header)
     
@@ -263,7 +288,7 @@ def display_statistics(stats):
         for col in columns:
             value = stats[col][stat_name]
             width = col_widths[col]
-            if math.isnan(value):
+            if is_nan(value):
                 row += f"{'NaN':>{width}}"
             elif stat_name == 'Count':
                 row += f"{value:>{width}.0f}"
@@ -274,7 +299,7 @@ def display_statistics(stats):
 
 def main():
     """Fonction principale"""
-    if len(sys.argv) != 2:
+    if ft_length(sys.argv) != 2:
         print("Usage: python describe.py <dataset.csv>", file=sys.stderr)
         sys.exit(1)
     

@@ -7,8 +7,14 @@ les deux features les plus similaires
 import sys
 import csv
 import matplotlib.pyplot as plt
-import numpy as np
 from itertools import combinations
+
+from utils import (
+    argmax_dict,
+    ft_length,
+    pearson_corr,
+    sort_pairs_by_value,
+)
 
 
 def read_csv(filepath):
@@ -52,22 +58,14 @@ def extract_features(data):
             if value is not None:
                 feature_data[feature].append(value)
             else:
-                feature_data[feature].append(np.nan)
+                feature_data[feature].append(None)
     
     return feature_data
 
 
 def calculate_correlation(x, y):
     """Calcule le coefficient de corrélation de Pearson"""
-    # Filtrer les valeurs NaN
-    valid_indices = ~(np.isnan(x) | np.isnan(y))
-    x_valid = x[valid_indices]
-    y_valid = y[valid_indices]
-    
-    if len(x_valid) < 2:
-        return 0.0
-    
-    return np.corrcoef(x_valid, y_valid)[0, 1]
+    return pearson_corr(x, y)
 
 
 def find_most_correlated_features(feature_data):
@@ -76,14 +74,14 @@ def find_most_correlated_features(feature_data):
     correlations = {}
     
     for feat1, feat2 in combinations(features, 2):
-        x = np.array(feature_data[feat1])
-        y = np.array(feature_data[feat2])
+        x = feature_data[feat1]
+        y = feature_data[feat2]
         
         corr = calculate_correlation(x, y)
         correlations[(feat1, feat2)] = abs(corr)
     
     # Trouver la paire avec la plus forte corrélation
-    most_similar = max(correlations, key=correlations.get)
+    most_similar = argmax_dict(correlations)
     
     return most_similar, correlations
 
@@ -97,27 +95,34 @@ def plot_scatter(feature_data, most_similar, correlations):
     fig.suptitle('Scatter Plots - Recherche de features similaires', fontsize=16)
     
     # Trier par corrélation
-    sorted_pairs = sorted(correlations.items(), key=lambda x: x[1], reverse=True)[:12]
+    sorted_pairs = sort_pairs_by_value(list(correlations.items()), reverse=True)
+    limit = 12
+    if ft_length(sorted_pairs) < limit:
+        limit = ft_length(sorted_pairs)
     
-    for idx, ((feat1, feat2), corr) in enumerate(sorted_pairs, 1):
+    idx = 1
+    pair_i = 0
+    while pair_i < limit:
+        (feat1, feat2), corr = sorted_pairs[pair_i]
         ax = plt.subplot(3, 4, idx)
-        
-        x = np.array(feature_data[feat1])
-        y = np.array(feature_data[feat2])
-        
-        # Filtrer les NaN
-        valid = ~(np.isnan(x) | np.isnan(y))
-        x_valid = x[valid]
-        y_valid = y[valid]
+
+        x_raw = feature_data[feat1]
+        y_raw = feature_data[feat2]
+
+        x_valid = []
+        y_valid = []
+        i = 0
+        n = ft_length(x_raw)
+        while i < n:
+            x = x_raw[i]
+            y = y_raw[i]
+            if x is not None and y is not None:
+                x_valid.append(x)
+                y_valid.append(y)
+            i += 1
         
         # Scatter plot
         ax.scatter(x_valid, y_valid, alpha=0.5, s=10)
-        
-        # Ligne de régression
-        if len(x_valid) > 1:
-            z = np.polyfit(x_valid, y_valid, 1)
-            p = np.poly1d(z)
-            ax.plot(x_valid, p(x_valid), "r--", alpha=0.8, linewidth=2)
         
         # Mettre en évidence la paire la plus similaire
         if (feat1, feat2) == most_similar:
@@ -133,6 +138,9 @@ def plot_scatter(feature_data, most_similar, correlations):
         ax.set_ylabel(feat2[:20], fontsize=7)
         ax.tick_params(labelsize=6)
         ax.grid(True, alpha=0.3)
+
+        idx += 1
+        pair_i += 1
     
     plt.tight_layout()
     plt.show()
@@ -140,7 +148,7 @@ def plot_scatter(feature_data, most_similar, correlations):
 
 def main():
     """Fonction principale"""
-    if len(sys.argv) != 2:
+    if ft_length(sys.argv) != 2:
         print("Usage: python scatter_plot.py <dataset.csv>", file=sys.stderr)
         sys.exit(1)
     
@@ -165,8 +173,17 @@ def main():
     print(f"  → Corrélation: {correlations[most_similar]:.6f}")
     
     print("\nTop 10 des paires les plus corrélées:")
-    for i, ((feat1, feat2), corr) in enumerate(sorted(correlations.items(), key=lambda x: x[1], reverse=True)[:10], 1):
+    ranked = sort_pairs_by_value(list(correlations.items()), reverse=True)
+    limit = 10
+    if ft_length(ranked) < limit:
+        limit = ft_length(ranked)
+    i = 1
+    idx = 0
+    while idx < limit:
+        (feat1, feat2), corr = ranked[idx]
         print(f"  {i}. {feat1:30s} <-> {feat2:30s} : r={corr:.6f}")
+        i += 1
+        idx += 1
     print("="*70 + "\n")
     
     # Afficher les scatter plots

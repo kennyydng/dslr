@@ -10,6 +10,29 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Makefile (optionnel)
+
+Vous pouvez aussi utiliser `make` (le Makefile crée automatiquement le venv si besoin).
+
+```bash
+make install
+make describe
+make histogram
+make scatter
+make pairplot
+make train
+make predict
+```
+
+Bonus:
+
+```bash
+make bonus-sgd
+make bonus-minibatch
+make bonus-compare
+make bonus-run
+```
+
 ## Utilisation
 
 ### 1. Analyse descriptive

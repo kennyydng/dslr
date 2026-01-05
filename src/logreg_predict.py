@@ -8,7 +8,8 @@ import sys
 import csv
 import json
 import math
-from collections import Counter
+
+from utils import clamp, ft_length, argmax_dict, count_occurrences, ft_sum
 
 
 def parse_float(value):
@@ -51,23 +52,29 @@ def load_weights(filepath):
 
 def sigmoid(z):
     """Fonction sigmoïde"""
-    z = max(-500, min(500, z))
+    z = clamp(z, -500, 500)
     return 1.0 / (1.0 + math.exp(-z))
 
 
 def predict_probability(X, weights):
     """Calcule la probabilité avec la régression logistique"""
     z = weights[0]  # Biais
-    for i in range(len(X)):
+    i = 0
+    n = ft_length(X)
+    while i < n:
         z += weights[i + 1] * X[i]
+        i += 1
     return sigmoid(z)
 
 
 def normalize_features(features, means, stds):
     """Normalise les features avec les paramètres d'entraînement"""
     normalized = []
-    for i in range(len(features)):
+    i = 0
+    n = ft_length(features)
+    while i < n:
         normalized.append((features[i] - means[i]) / stds[i])
+        i += 1
     return normalized
 
 
@@ -83,7 +90,7 @@ def predict_house(features, models, means, stds):
         probabilities[house] = prob
     
     # Retourner la maison avec la probabilité la plus élevée
-    predicted_house = max(probabilities, key=probabilities.get)
+    predicted_house = argmax_dict(probabilities)
     return predicted_house
 
 
@@ -110,11 +117,15 @@ def visualize_predictions(predictions_list, dataset_file=None):
     colors = ['#d32f2f', '#43a047', '#1976d2', '#fdd835']
     
     # Extraire les prédictions
-    predictions = [house for _, house in predictions_list]
+    predictions = []
+    for _, house in predictions_list:
+        predictions.append(house)
     
     # Compter les prédictions
-    pred_counts = Counter(predictions)
-    pred_values = [pred_counts.get(house, 0) for house in houses]
+    pred_counts = count_occurrences(predictions)
+    pred_values = []
+    for house in houses:
+        pred_values.append(pred_counts.get(house, 0))
     
     # Charger les vraies valeurs si disponibles
     true_labels = None
@@ -122,15 +133,21 @@ def visualize_predictions(predictions_list, dataset_file=None):
         try:
             with open(dataset_file, 'r') as f:
                 reader = csv.DictReader(f)
-                true_labels = [row.get('Hogwarts House') for row in reader 
-                             if row.get('Hogwarts House')]
+                labels = []
+                for row in reader:
+                    label = row.get('Hogwarts House')
+                    if label:
+                        labels.append(label)
+                true_labels = labels
         except:
             true_labels = None
     
     if true_labels:
         # Si on a les vraies valeurs, les afficher aussi
-        true_counts = Counter(true_labels)
-        true_values = [true_counts.get(house, 0) for house in houses]
+        true_counts = count_occurrences(true_labels)
+        true_values = []
+        for house in houses:
+            true_values.append(true_counts.get(house, 0))
         
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
         
@@ -159,7 +176,7 @@ def visualize_predictions(predictions_list, dataset_file=None):
                     f'{int(height)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
         # Graphique 3: Comparaison
-        x = range(len(houses))
+        x = range(ft_length(houses))
         width = 0.35
         
         bars3a = ax3.bar([i - width/2 for i in x], true_values, width, 
@@ -215,32 +232,49 @@ def visualize_predictions(predictions_list, dataset_file=None):
     if true_labels:
         print("\nPRÉDICTIONS:")
     
-    total_pred = sum(pred_values)
-    for house, count in zip(houses, pred_values):
+    total_pred = ft_sum(pred_values)
+    i = 0
+    n = ft_length(houses)
+    while i < n:
+        house = houses[i]
+        count = pred_values[i]
         percentage = (count / total_pred * 100) if total_pred > 0 else 0
         print(f"  {house:15s} : {count:4d} étudiants ({percentage:5.2f}%)")
+        i += 1
     print(f"  {'TOTAL':15s} : {total_pred:4d} étudiants")
     
     if true_labels:
         print("\nVRAIES VALEURS:")
-        total_true = sum(true_values)
-        for house, count in zip(houses, true_values):
+        total_true = ft_sum(true_values)
+        i = 0
+        n = ft_length(houses)
+        while i < n:
+            house = houses[i]
+            count = true_values[i]
             percentage = (count / total_true * 100) if total_true > 0 else 0
             print(f"  {house:15s} : {count:4d} étudiants ({percentage:5.2f}%)")
+            i += 1
         print(f"  {'TOTAL':15s} : {total_true:4d} étudiants")
         
         # Calculer la précision si possible
-        if len(predictions) == len(true_labels):
-            correct = sum(1 for p, t in zip(predictions, true_labels) if p == t)
-            accuracy = (correct / len(predictions) * 100)
-            print(f"\nPRÉCISION GLOBALE: {accuracy:.2f}% ({correct}/{len(predictions)})")
+        pred_n = ft_length(predictions)
+        true_n = ft_length(true_labels)
+        if pred_n == true_n:
+            correct = 0
+            i = 0
+            while i < pred_n:
+                if predictions[i] == true_labels[i]:
+                    correct += 1
+                i += 1
+            accuracy = (correct / pred_n * 100) if pred_n > 0 else 0
+            print(f"\nPRÉCISION GLOBALE: {accuracy:.2f}% ({correct}/{pred_n})")
     
     print("="*70 + "\n")
 
 
 def main():
     """Fonction principale"""
-    if len(sys.argv) != 3:
+    if ft_length(sys.argv) != 3:
         print("Usage: python logreg_predict.py <dataset_test.csv> <weights.json>", file=sys.stderr)
         sys.exit(1)
     
@@ -266,7 +300,8 @@ def main():
     # Lire le dataset de test
     print(f"\nChargement du dataset: {dataset_file}")
     data = read_csv(dataset_file)
-    print(f"  → {len(data)} lignes chargées")
+    data_n = ft_length(data)
+    print(f"  → {data_n} lignes chargées")
     
     # Faire les prédictions
     print("\nPrédiction en cours...")
@@ -295,7 +330,7 @@ def main():
             # Si des valeurs manquent, prédire "Unknown" ou la maison la plus probable par défaut
             predictions.append((index, "Gryffindor"))  # Défaut
     
-    print(f"  → {valid_predictions}/{len(data)} prédictions valides")
+    print(f"  → {valid_predictions}/{data_n} prédictions valides")
     
     # Sauvegarder les résultats
     print("\nSauvegarde des prédictions...")
@@ -305,10 +340,16 @@ def main():
     print("\nÉchantillon des prédictions:")
     print(f"{'Index':<10} {'Maison Prédite'}")
     print("-" * 30)
-    for i in range(min(10, len(predictions))):
+    pred_n = ft_length(predictions)
+    limit = 10
+    if pred_n < limit:
+        limit = pred_n
+    i = 0
+    while i < limit:
         index, house = predictions[i]
         print(f"{index:<10} {house}")
-    if len(predictions) > 10:
+        i += 1
+    if pred_n > 10:
         print("...")
     
     print("\n" + "="*70)

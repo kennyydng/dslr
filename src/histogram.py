@@ -7,7 +7,16 @@ la distribution de scores la plus homogène entre les quatre maisons
 import sys
 import csv
 import matplotlib.pyplot as plt
-import numpy as np
+
+from utils import (
+    argmin_dict,
+    ft_length,
+    ft_max,
+    ft_min,
+    mean,
+    sort_pairs_by_value,
+    variance,
+)
 
 
 def read_csv(filepath):
@@ -74,12 +83,11 @@ def calculate_homogeneity(course_data):
         means = []
         for house, scores in houses_scores.items():
             if scores:
-                means.append(np.mean(scores))
+                means.append(mean(scores))
         
         if means:
             # Variance des moyennes (plus c'est faible, plus c'est homogène)
-            variance = np.var(means)
-            homogeneity_scores[course] = variance
+            homogeneity_scores[course] = variance(means)
     
     return homogeneity_scores
 
@@ -91,7 +99,7 @@ def plot_histograms(course_data, most_homogeneous):
     
     # Créer une figure avec tous les cours
     courses = list(course_data.keys())
-    n_courses = len(courses)
+    n_courses = ft_length(courses)
     
     # Disposition en grille
     n_cols = 4
@@ -118,7 +126,18 @@ def plot_histograms(course_data, most_homogeneous):
             continue
         
         # Créer les bins
-        bins = np.linspace(min(all_scores), max(all_scores), 30)
+            min_s = ft_min(all_scores)
+            max_s = ft_max(all_scores)
+            n_bins = 30
+            if max_s == min_s:
+                # Single-value fallback: create a small range.
+                max_s = min_s + 1.0
+            step = (max_s - min_s) / n_bins
+            bins = []
+            i = 0
+            while i <= n_bins:
+                bins.append(min_s + step * i)
+                i += 1
         
         # Tracer l'histogramme pour chaque maison
         for house, color in zip(houses, colors):
@@ -141,7 +160,7 @@ def plot_histograms(course_data, most_homogeneous):
         ax.grid(True, alpha=0.3)
     
     # Cacher les axes inutilisés
-    for idx in range(len(courses), len(axes_flat)):
+    for idx in range(ft_length(courses), ft_length(axes_flat)):
         axes_flat[idx].set_visible(False)
     
     plt.tight_layout()
@@ -150,7 +169,7 @@ def plot_histograms(course_data, most_homogeneous):
 
 def main():
     """Fonction principale"""
-    if len(sys.argv) != 2:
+    if ft_length(sys.argv) != 2:
         print("Usage: python histogram.py <dataset.csv>", file=sys.stderr)
         sys.exit(1)
     
@@ -166,7 +185,7 @@ def main():
     homogeneity = calculate_homogeneity(course_data)
     
     # Trouver le cours le plus homogène (variance la plus faible)
-    most_homogeneous = min(homogeneity, key=homogeneity.get)
+    most_homogeneous = argmin_dict(homogeneity)
     
     print("\n" + "="*70)
     print("ANALYSE DE L'HOMOGÉNÉITÉ DES DISTRIBUTIONS PAR COURS")
@@ -175,8 +194,17 @@ def main():
     print(f"  → {most_homogeneous}")
     print(f"  → Variance des moyennes: {homogeneity[most_homogeneous]:.6f}")
     print("\nClassement par homogénéité (variance des moyennes):")
-    for i, (course, var) in enumerate(sorted(homogeneity.items(), key=lambda x: x[1])[:5], 1):
+    ranked = sort_pairs_by_value(list(homogeneity.items()), reverse=False)
+    i = 1
+    limit = 5
+    if ft_length(ranked) < limit:
+        limit = ft_length(ranked)
+    idx = 0
+    while idx < limit:
+        course, var = ranked[idx]
         print(f"  {i}. {course:30s} : {var:.6f}")
+        i += 1
+        idx += 1
     print("="*70 + "\n")
     
     # Afficher les histogrammes
