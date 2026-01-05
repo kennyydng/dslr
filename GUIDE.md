@@ -9,7 +9,7 @@ Documentation détaillée de chaque fonction et résultat du projet.
 ### Fonction
 Calcule les statistiques descriptives pour chaque feature numérique du dataset.
 
-### Statistiques calculées (12 au total)
+### Statistiques calculées (11 au total)
 1. **Count** : Nombre de valeurs non-nulles
 2. **Mean** : Moyenne arithmétique
 3. **Std** : Écart-type (dispersion autour de la moyenne)
@@ -19,16 +19,15 @@ Calcule les statistiques descriptives pour chaque feature numérique du dataset.
 7. **75%** : Troisième quartile (Q3)
 8. **Max** : Valeur maximum
 9. **Range** : Max - Min (étendue totale)
-10. **IQR** : Q3 - Q1 (écart interquartile, 50% centraux)
-11. **Skewness** : Asymétrie de la distribution
-12. **Kurtosis** : Épaisseur des queues de distribution
+10. **Skewness** : Asymétrie de la distribution
+11. **Kurtosis** : Épaisseur des queues de distribution
 
 ### Résultat
-Affiche un tableau formaté avec 12 statistiques × 13 features numériques.
+Affiche un tableau formaté avec 11 statistiques × 13 features numériques.
 
 ### Utilité
 - Comprendre la distribution des données
-- Détecter les outliers (Range, IQR)
+- Détecter les outliers (Range)
 - Identifier les asymétries (Skewness)
 - Évaluer la normalité (Kurtosis)
 
@@ -288,7 +287,7 @@ Affiche les différences de poids apprises par chaque algorithme pour chaque fea
 Script interactif qui lance tous les bonus séquentiellement avec des pauses explicatives.
 
 ### Étapes
-1. Affiche les statistiques avancées (Range, IQR, Skewness, Kurtosis)
+1. Affiche les statistiques avancées (Range, Skewness, Kurtosis)
 2. Entraîne avec Batch GD
 3. Entraîne avec SGD
 4. Entraîne avec Mini-Batch GD

@@ -39,7 +39,7 @@ make bonus-run
 ```bash
 python src/describe.py datasets/dataset_train.csv
 ```
-Affiche les statistiques (Count, Mean, Std, Min, 25%, 50%, 75%, Max, Range, IQR, Skewness, Kurtosis).
+Affiche les statistiques (Count, Mean, Std, Min, 25%, 50%, 75%, Max, Range, Skewness, Kurtosis).
 
 ### 2. Visualisations
 
@@ -134,7 +134,7 @@ dslr/
 
 | Script | Sortie | Info |
 |--------|--------|------|
-| `describe.py` | 12 stats × 13 features | Count, Mean, Std, Min, 25%, 50%, 75%, Max, Range, IQR, Skewness, Kurtosis |
+| `describe.py` | 11 stats × 13 features | Count, Mean, Std, Min, 25%, 50%, 75%, Max, Range, Skewness, Kurtosis |
 | `histogram.py` | Graphiques | Care of Magical Creatures = plus homogène |
 | `scatter_plot.py` | Graphiques | Astronomy & Defense = corrélation parfaite (r=1.0) |
 | `pair_plot.py` | Graphiques + scores | Top 5 features identifiées |

@@ -7,8 +7,10 @@ avec Stochastic Gradient Descent (SGD) pour prédire la maison de Poudlard
 import sys
 import csv
 import json
-import math
 import random
+
+sys.path.insert(0, '../src')
+from utils import ft_sqrt, ft_exp, ft_log
 
 
 def parse_float(value):
@@ -74,7 +76,7 @@ def normalize_features(X):
         values = [row[j] for row in X]
         mean = sum(values) / len(values)
         variance = sum((x - mean) ** 2 for x in values) / len(values)
-        std = math.sqrt(variance) if variance > 0 else 1.0
+        std = ft_sqrt(variance) if variance > 0 else 1.0
         
         means.append(mean)
         stds.append(std)
@@ -92,7 +94,7 @@ def sigmoid(z):
     """Fonction sigmoïde"""
     # Clipper pour éviter l'overflow
     z = max(-500, min(500, z))
-    return 1.0 / (1.0 + math.exp(-z))
+    return 1.0 / (1.0 + ft_exp(-z))
 
 
 def predict_probability(X, weights):
@@ -113,7 +115,7 @@ def compute_cost(X, y_binary, weights):
         h = predict_probability(X[i], weights)
         # Éviter log(0)
         h = max(1e-15, min(1 - 1e-15, h))
-        cost = -y_binary[i] * math.log(h) - (1 - y_binary[i]) * math.log(1 - h)
+        cost = -y_binary[i] * ft_log(h) - (1 - y_binary[i]) * ft_log(1 - h)
         total_cost += cost
     
     return total_cost / m

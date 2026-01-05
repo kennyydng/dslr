@@ -4,7 +4,6 @@
 
 ### Nouvelles statistiques
 - **Range** : `Max - Min` (étendue totale)
-- **IQR** : `Q3 - Q1` (écart interquartile, 50% centraux)
 - **Skewness** : Asymétrie de la distribution
   - < 0 : asymétrique gauche
   - ≈ 0 : symétrique
@@ -18,7 +17,7 @@
 ```bash
 python src/describe.py datasets/dataset_train.csv
 ```
-→ Affiche 12 statistiques au lieu de 8
+→ Affiche 11 statistiques au lieu de 8
 
 ---
 

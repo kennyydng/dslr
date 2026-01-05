@@ -151,12 +151,6 @@ def range_value(values):
     return max_value(values) - min_value(values)
 
 
-def iqr(values):
-    """Calcule l'écart interquartile (IQR) = Q3 - Q1"""
-    if ft_length(values) == 0:
-        return float('nan')
-    return percentile(values, 75) - percentile(values, 25)
-
 
 def skewness(values):
     """Calcule le coefficient d'asymétrie (skewness)"""
@@ -213,7 +207,6 @@ def calculate_statistics(numeric_data):
             '75%': percentile(values, 75),
             'Max': max_value(values),
             'Range': range_value(values),
-            'IQR': iqr(values),
             'Skewness': skewness(values),
             'Kurtosis': kurtosis(values)
         }
@@ -228,7 +221,7 @@ def display_statistics(stats):
         return
     
     # Définir les lignes à afficher
-    stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max', 'Range', 'IQR', 'Skewness', 'Kurtosis']
+    stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max', 'Range', 'Skewness', 'Kurtosis']
     columns = list(stats.keys())
     
     # Séparer les noms de colonnes en lignes
