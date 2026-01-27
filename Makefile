@@ -52,9 +52,6 @@ bonus-minibatch:
 bonus-compare: 
 	$(PY) bonus/compare_methods.py
 
-bonus-run: 
-	bash bonus/run_all_bonus.sh
-
 clean:
 	rm -f houses.csv $(WEIGHTS) weights_sgd.json weights_minibatch.json
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +

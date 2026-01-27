@@ -136,7 +136,6 @@ def plot_histograms(course_data, most_homogeneous):
             bins.append(min_s + step * i)
             i += 1
         
-        # Tracer l'histogramme pour chaque maison
         for house, color in zip(houses, colors):
             scores = course_data[course][house]
             if scores:
