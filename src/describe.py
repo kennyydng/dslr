@@ -33,8 +33,8 @@ def read_csv(filepath):
         sys.exit(1)
 
 
-def shorten_column_name(name):
-    """Raccourcit les noms de colonnes trop longs"""
+def format_col_name(name):
+    """Change le format des noms de colonnes trop longs"""
     split_names = {
         'Defense Against the Dark Arts': 'Defense\nagainst\n Dark Arts',
         'Care of Magical Creatures': 'Care of\nMagical\nCreatures',
@@ -46,16 +46,14 @@ def shorten_column_name(name):
     return split_names.get(name, name)
 
 
-def extract_numeric_columns(headers, data):
-    """Extrait les colonnes numériques du dataset"""
+def extract_numeric_data(headers, data):
+    """Extrait les statistiques (donnees numerique)"""
     numeric_data = {}
-    
     excluded_columns = {'Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand', 'Hogwarts House'}
     
     for col_idx, header in enumerate(headers):
         if header in excluded_columns:
             continue
-            
         column_values = []
         
         for row in data:
@@ -69,7 +67,7 @@ def extract_numeric_columns(headers, data):
                 column_values.append(value)
         
         if column_values:
-            short_name = shorten_column_name(header)
+            short_name = format_col_name(header)
             numeric_data[short_name] = column_values
     
     return numeric_data
@@ -172,7 +170,6 @@ def display_statistics(stats):
         print("no data found.")
         return
     
-    # Définir les lignes à afficher
     stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max', 'Range', 'Skewness', 'Kurtosis']
     columns = list(stats.keys())
     
@@ -189,7 +186,6 @@ def display_statistics(stats):
     # Calculer la largeur optimale pour chaque colonne
     col_widths = {}
     for i, col in enumerate(columns):
-        # Largeur minimale = longueur max des lignes du nom
         max_width = 0
         for line in col_lines[i]:
             w = str_length(line)
@@ -247,7 +243,7 @@ def main():
     
     filepath = sys.argv[1]
     headers, data = read_csv(filepath)
-    numeric_data = extract_numeric_columns(headers, data)
+    numeric_data = extract_numeric_data(headers, data)
     stats = calculate_statistics(numeric_data)
     display_statistics(stats)
 
