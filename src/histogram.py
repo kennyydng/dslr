@@ -96,8 +96,6 @@ def plot_histograms(course_data, most_homogeneous):
     """Affiche les histogrammes des cours"""
     houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
     colors = ['#740001', '#1a472a', '#0e1a40', '#ecb939']
-    
-    # Créer une figure avec tous les cours
     courses = list(course_data.keys())
     n_courses = ft_length(courses)
     
@@ -127,12 +125,12 @@ def plot_histograms(course_data, most_homogeneous):
         min_s = ft_min(all_scores)
         max_s = ft_max(all_scores)
         n_bins = 30
-        
+
         if max_s == min_s:
-            # Single-value fallback: create a small range.
             max_s = min_s + 1.0
         step = (max_s - min_s) / n_bins
         bins = []
+
         i = 0
         while i <= n_bins:
             bins.append(min_s + step * i)
@@ -144,7 +142,6 @@ def plot_histograms(course_data, most_homogeneous):
             if scores:
                 ax.hist(scores, bins=bins, alpha=0.5, label=house, color=color, edgecolor='black', linewidth=0.5)
         
-        # Mettre en évidence le cours le plus homogène
         if course == most_homogeneous:
             ax.set_title(f'{course}\n★ MOST HOMOGENEOUS ★', fontweight='bold', fontsize=10, color='red')
             ax.patch.set_edgecolor('red')

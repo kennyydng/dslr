@@ -35,11 +35,11 @@ def read_csv(filepath):
 
 def shorten_column_name(name):
     """Raccourcit les noms de colonnes trop longs"""
-    # Garder les noms complets mais les diviser sur deux lignes si nécessaire
     split_names = {
-        'Defense Against the Dark Arts': 'Defense Against\nthe Dark Arts',
-        'Care of Magical Creatures': 'Care of Magical\nCreatures',
-        'History of Magic': 'History of\nMagic',
+        'Defense Against the Dark Arts': 'Defense\nagainst\n Dark Arts',
+        'Care of Magical Creatures': 'Care of\nMagical\nCreatures',
+        'History of Magic': 'Hist of\nMagic',
+        'Transfiguration': 'Transfig',
         'Muggle Studies': 'Muggle\nStudies',
         'Ancient Runes': 'Ancient\nRunes'
     }
@@ -50,11 +50,9 @@ def extract_numeric_columns(headers, data):
     """Extrait les colonnes numériques du dataset"""
     numeric_data = {}
     
-    # Colonnes à exclure (identifiants, noms, etc.)
     excluded_columns = {'Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand', 'Hogwarts House'}
     
     for col_idx, header in enumerate(headers):
-        # Ignorer les colonnes non pertinentes
         if header in excluded_columns:
             continue
             
@@ -70,7 +68,6 @@ def extract_numeric_columns(headers, data):
             if value is not None:
                 column_values.append(value)
         
-        # On considère une colonne comme numérique si elle contient au moins une valeur numérique
         if column_values:
             short_name = shorten_column_name(header)
             numeric_data[short_name] = column_values
@@ -172,7 +169,7 @@ def calculate_statistics(numeric_data):
 def display_statistics(stats):
     """Affiche les statistiques sous forme de tableau formaté"""
     if not stats:
-        print("Aucune donnée numérique trouvée.")
+        print("no data found.")
         return
     
     # Définir les lignes à afficher
@@ -199,7 +196,7 @@ def display_statistics(stats):
             if w > max_width:
                 max_width = w
         
-        # Vérifier la largeur nécessaire pour chaque statistique
+        # Vérifier la largeur nécessaire pour chaque stats
         for stat_name in stat_names:
             value = stats[col][stat_name]
             if is_nan(value):
@@ -221,7 +218,6 @@ def display_statistics(stats):
             first_col_width = w
     first_col_width += 2
     
-    # En-tête sur plusieurs lignes
     for line_idx in range(max_lines):
         header = ' ' * first_col_width
         for i, col in enumerate(columns):
@@ -230,7 +226,6 @@ def display_statistics(stats):
             header += f"{line_text:>{col_widths[col]}}"
         print(header)
     
-    # Lignes de statistiques
     for stat_name in stat_names:
         row = f"{stat_name:<{first_col_width}}"
         for col in columns:
@@ -246,23 +241,14 @@ def display_statistics(stats):
 
 
 def main():
-    """Fonction principale"""
     if ft_length(sys.argv) != 2:
         print("Usage: python describe.py <dataset.csv>", file=sys.stderr)
         sys.exit(1)
     
     filepath = sys.argv[1]
-    
-    # Lire le fichier CSV
     headers, data = read_csv(filepath)
-    
-    # Extraire les colonnes numériques
     numeric_data = extract_numeric_columns(headers, data)
-    
-    # Calculer les statistiques
     stats = calculate_statistics(numeric_data)
-    
-    # Afficher les résultats
     display_statistics(stats)
 
 

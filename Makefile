@@ -25,34 +25,34 @@ venv:
 install: venv
 	$(PIP) install -r requirements.txt
 
-describe: install
+describe: 
 	$(PY) src/describe.py $(TRAIN_DATA)
 
-histogram: install
+histogram: 
 	$(PY) src/histogram.py $(TRAIN_DATA)
 
-scatter: install
+scatter: 
 	$(PY) src/scatter_plot.py $(TRAIN_DATA)
 
-pairplot: install
+pairplot: 
 	$(PY) src/pair_plot.py $(TRAIN_DATA)
 
-train: install
+train: 
 	$(PY) src/logreg_train.py $(TRAIN_DATA)
 
-predict: install
+predict: 
 	$(PY) src/logreg_predict.py $(TEST_DATA) $(WEIGHTS)
 
-bonus-sgd: install
+bonus-sgd: 
 	$(PY) bonus/logreg_train_sgd.py $(TRAIN_DATA)
 
-bonus-minibatch: install
+bonus-minibatch: 
 	$(PY) bonus/logreg_train_minibatch.py $(TRAIN_DATA) $(BATCH)
 
-bonus-compare: install
+bonus-compare: 
 	$(PY) bonus/compare_methods.py
 
-bonus-run: install
+bonus-run: 
 	bash bonus/run_all_bonus.sh
 
 clean:
