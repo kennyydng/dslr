@@ -116,7 +116,6 @@ def plot_histograms(course_data, most_homogeneous):
     for idx, course in enumerate(courses):
         ax = axes_flat[idx]
         
-        # Collecter toutes les données pour déterminer les bins
         all_scores = []
         for scores in course_data[course].values():
             all_scores.extend(scores)
@@ -125,10 +124,10 @@ def plot_histograms(course_data, most_homogeneous):
             ax.set_visible(False)
             continue
         
-        # Créer les bins
         min_s = ft_min(all_scores)
         max_s = ft_max(all_scores)
         n_bins = 30
+        
         if max_s == min_s:
             # Single-value fallback: create a small range.
             max_s = min_s + 1.0
@@ -174,17 +173,9 @@ def main():
         sys.exit(1)
     
     filepath = sys.argv[1]
-    
-    # Lire les données
     data = read_csv(filepath)
-    
-    # Extraire les scores par cours et par maison
     course_data = get_course_scores_by_house(data)
-    
-    # Calculer l'homogénéité
     homogeneity = calculate_homogeneity(course_data)
-    
-    # Trouver le cours le plus homogène (variance la plus faible)
     most_homogeneous = argmin_dict(homogeneity)
     
     print("\n" + "="*70)
@@ -197,9 +188,12 @@ def main():
     ranked = sort_pairs_by_value(list(homogeneity.items()), reverse=False)
     i = 1
     limit = 5
+
     if ft_length(ranked) < limit:
         limit = ft_length(ranked)
+
     idx = 0
+
     while idx < limit:
         course, var = ranked[idx]
         print(f"  {i}. {course:30s} : {var:.6f}")
@@ -207,7 +201,6 @@ def main():
         idx += 1
     print("="*70 + "\n")
     
-    # Afficher les histogrammes
     plot_histograms(course_data, most_homogeneous)
 
 

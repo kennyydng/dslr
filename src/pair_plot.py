@@ -16,8 +16,6 @@ from utils import (
     ft_variance,
     pearson_corr,
     sort_pairs_by_value,
-    ft_min,
-    ft_max,
 )
 
 

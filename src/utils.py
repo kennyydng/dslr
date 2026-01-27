@@ -1,14 +1,8 @@
-"""Shared manual helpers for DSLR.
-
-The project constraints forbid using high-level helpers that compute statistics for you
-(e.g. mean/std/min/max/percentile/corrcoef/describe). This module provides loop-based
-implementations that can be reused across scripts.
-"""
-
 from __future__ import annotations
 
 
 def ft_length(items) -> int:
+    """Calcule la longueur d'un itérable."""
     n = 0
     for _ in items:
         n += 1
@@ -16,6 +10,7 @@ def ft_length(items) -> int:
 
 
 def str_length(text: str) -> int:
+    """Calcule la longueur d'une chaîne de caractères."""
     n = 0
     for _ in text:
         n += 1
@@ -23,6 +18,7 @@ def str_length(text: str) -> int:
 
 
 def ft_sum(values) -> float:
+    """Calcule la somme des éléments d'un itérable."""
     total = 0.0
     for x in values:
         total += x
@@ -30,6 +26,7 @@ def ft_sum(values) -> float:
 
 
 def ft_min(values) -> float:
+    """Trouve la valeur minimale dans un itérable."""
     n = ft_length(values)
     if n == 0:
         return float('nan')
@@ -41,6 +38,7 @@ def ft_min(values) -> float:
 
 
 def ft_max(values) -> float:
+    """Trouve la valeur maximale dans un itérable."""
     n = ft_length(values)
     if n == 0:
         return float('nan')
@@ -52,6 +50,7 @@ def ft_max(values) -> float:
 
 
 def clamp(value: float, low: float, high: float) -> float:
+    """Restreint une valeur à un intervalle [low, high]."""
     if value < low:
         return low
     if value > high:
@@ -60,12 +59,20 @@ def clamp(value: float, low: float, high: float) -> float:
 
 
 def is_nan(value: float) -> bool:
+    """Vérifie si une valeur est NaN (Not a Number)."""
     # NaN is the only float that is not equal to itself.
     return value != value
 
+def parse_float(value):
+    """Convertit une valeur en float, retourne None si impossible."""
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
+
 
 def ft_floor(x: float) -> int:
-    """Manual floor (largest integer <= x)."""
+    """Calcule la partie entière inférieure (plus grand entier <= x)."""
     if is_nan(x):
         return 0
     i = int(x)
@@ -75,7 +82,7 @@ def ft_floor(x: float) -> int:
 
 
 def ft_ceil(x: float) -> int:
-    """Manual ceil (smallest integer >= x)."""
+    """Calcule la partie entière supérieure (plus petit entier >= x)."""
     if is_nan(x):
         return 0
     i = int(x)
@@ -85,13 +92,14 @@ def ft_ceil(x: float) -> int:
 
 
 def ft_abs(x: float) -> float:
+    """Calcule la valeur absolue d'un nombre."""
     if x < 0:
         return -x
     return x
 
 
 def ft_sqrt(x: float) -> float:
-    """Manual square root using Newton-Raphson."""
+    """Calcule la racine carrée via la méthode de Newton-Raphson."""
     if is_nan(x) or x < 0:
         return float('nan')
     if x == 0.0:
@@ -106,7 +114,7 @@ def ft_sqrt(x: float) -> float:
 
 
 def ft_exp(x: float) -> float:
-    """Manual exp using Taylor series."""
+    """Calcule l'exponentielle via la série de Taylor."""
     if is_nan(x):
         return float('nan')
     # Handle large negative/positive to avoid overflow
@@ -126,7 +134,7 @@ def ft_exp(x: float) -> float:
 
 
 def ft_log(x: float) -> float:
-    """Manual natural log using Newton-Raphson on exp."""
+    """Calcule le logarithme naturel via Newton-Raphson sur exp."""
     if is_nan(x) or x <= 0:
         return float('nan')
     # Initial guess
@@ -147,6 +155,7 @@ def ft_log(x: float) -> float:
 
 
 def ft_mean(values) -> float:
+    """Calcule la moyenne arithmétique."""
     n = ft_length(values)
     if n == 0:
         return float('nan')
@@ -154,6 +163,7 @@ def ft_mean(values) -> float:
 
 
 def ft_variance(values, mean_val: float | None = None) -> float:
+    """Calcule la variance."""
     n = ft_length(values)
     if n == 0:
         return float('nan')
@@ -171,6 +181,7 @@ def ft_variance(values, mean_val: float | None = None) -> float:
 
 
 def ft_std(values) -> float:
+    """Calcule l'écart-type."""
     v = ft_variance(values)
     if is_nan(v):
         return float('nan')
@@ -178,6 +189,7 @@ def ft_std(values) -> float:
 
 
 def merge_sorted(left, right):
+    """Fusionne deux listes triées en une seule liste triée."""
     merged = []
     i = 0
     j = 0
@@ -200,6 +212,7 @@ def merge_sorted(left, right):
 
 
 def merge_sort(values):
+    """Trie une liste en utilisant l'algorithme de tri fusion (mergesort)."""
     n = ft_length(values)
     if n <= 1:
         return values[:]
@@ -210,8 +223,7 @@ def merge_sort(values):
 
 
 def sort_pairs_by_value(pairs, reverse: bool = False):
-    """Stable mergesort for list of (key, value) pairs by value."""
-
+    """Trie des paires (clé, valeur) par valeur en utilisant un tri fusion stable."""   
     n = ft_length(pairs)
     if n <= 1:
         return pairs[:]
@@ -250,6 +262,7 @@ def sort_pairs_by_value(pairs, reverse: bool = False):
 
 
 def argmax_dict(dct):
+    """Retourne la clé correspondant à la valeur maximale dans un dictionnaire."""
     best_key = None
     best_val = None
     for k, v in dct.items():
@@ -260,6 +273,7 @@ def argmax_dict(dct):
 
 
 def argmin_dict(dct):
+    """Retourne la clé correspondant à la valeur minimale dans un dictionnaire."""
     best_key = None
     best_val = None
     for k, v in dct.items():
@@ -270,6 +284,7 @@ def argmin_dict(dct):
 
 
 def count_occurrences(items):
+    """Compte les occurrences de chaque élément dans un itérable."""
     counts = {}
     for x in items:
         if x in counts:
@@ -280,8 +295,7 @@ def count_occurrences(items):
 
 
 def pearson_corr(x_values, y_values) -> float:
-    """Pearson correlation (filters out missing pairs where value is None)."""
-
+    """Calcule la corrélation de Pearson entre deux variables (ignore les valeurs None)."""
     xs = []
     ys = []
     i = 0

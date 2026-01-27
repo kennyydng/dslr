@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Programme describe - Analyse descriptive d'un dataset
-Affiche les statistiques descriptives pour toutes les features numériques
-"""
-
 import sys
 import csv
 
@@ -17,17 +12,9 @@ from utils import (
     ft_floor,
     ft_ceil,
     ft_mean,
-    ft_variance,
     ft_std,
+    parse_float,
 )
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
 
 
 def read_csv(filepath):
@@ -91,36 +78,6 @@ def extract_numeric_columns(headers, data):
     return numeric_data
 
 
-def count(values):
-    """Compte le nombre de valeurs non-nulles"""
-    return ft_length(values)
-
-
-def mean(values):
-    """Calcule la moyenne"""
-    return ft_mean(values)
-
-
-def variance(values, mean_val):
-    """Calcule la variance"""
-    return ft_variance(values, mean_val)
-
-
-def std(values):
-    """Calcule l'écart-type"""
-    return ft_std(values)
-
-
-def min_value(values):
-    """Retourne la valeur minimale"""
-    return ft_min(values)
-
-
-def max_value(values):
-    """Retourne la valeur maximale"""
-    return ft_max(values)
-
-
 def percentile(values, p):
     """Calcule le percentile p (0-100)"""
     if ft_length(values) == 0:
@@ -146,7 +103,7 @@ def range_value(values):
     """Calcule l'étendue (range) = max - min"""
     if ft_length(values) == 0:
         return float('nan')
-    return max_value(values) - min_value(values)
+    return ft_max(values) - ft_min(values)
 
 
 
@@ -156,8 +113,8 @@ def skewness(values):
         return float('nan')
     
     n = ft_length(values)
-    mean_val = mean(values)
-    std_val = std(values)
+    mean_val = ft_mean(values)
+    std_val = ft_std(values)
     
     if std_val == 0 or is_nan(std_val):
         return float('nan')
@@ -176,8 +133,8 @@ def kurtosis(values):
         return float('nan')
     
     n = ft_length(values)
-    mean_val = mean(values)
-    std_val = std(values)
+    mean_val = ft_mean(values)
+    std_val = ft_std(values)
     
     if std_val == 0 or is_nan(std_val):
         return float('nan')
@@ -196,14 +153,14 @@ def calculate_statistics(numeric_data):
     
     for column, values in numeric_data.items():
         stats[column] = {
-            'Count': count(values),
-            'Mean': mean(values),
-            'Std': std(values),
-            'Min': min_value(values),
+            'Count': ft_length(values),
+            'Mean': ft_mean(values),
+            'Std': ft_std(values),
+            'Min': ft_min(values),
             '25%': percentile(values, 25),
             '50%': percentile(values, 50),
             '75%': percentile(values, 75),
-            'Max': max_value(values),
+            'Max': ft_max(values),
             'Range': range_value(values),
             'Skewness': skewness(values),
             'Kurtosis': kurtosis(values)
