@@ -121,7 +121,6 @@ def plot_scatter(feature_data, most_similar, correlations):
                 y_valid.append(y)
             i += 1
         
-        # Scatter plot
         ax.scatter(x_valid, y_valid, alpha=0.5, s=10)
         
         # Mettre en évidence la paire la plus similaire
@@ -147,23 +146,15 @@ def plot_scatter(feature_data, most_similar, correlations):
 
 
 def main():
-    """Fonction principale"""
     if ft_length(sys.argv) != 2:
         print("Usage: python scatter_plot.py <dataset.csv>", file=sys.stderr)
         sys.exit(1)
     
     filepath = sys.argv[1]
-    
-    # Lire les données
     data = read_csv(filepath)
-    
-    # Extraire les features
     feature_data = extract_features(data)
-    
-    # Trouver les features les plus similaires
     most_similar, correlations = find_most_correlated_features(feature_data)
     
-    # Afficher les résultats
     print("\n" + "="*70)
     print("ANALYSE DE SIMILARITÉ ENTRE FEATURES")
     print("="*70)
@@ -171,14 +162,15 @@ def main():
     print(f"  → {most_similar[0]}")
     print(f"  → {most_similar[1]}")
     print(f"  → Corrélation: {correlations[most_similar]:.6f}")
-    
     print("\nTop 10 des paires les plus corrélées:")
     ranked = sort_pairs_by_value(list(correlations.items()), reverse=True)
     limit = 10
-    if ft_length(ranked) < limit:
-        limit = ft_length(ranked)
     i = 1
     idx = 0
+
+    if ft_length(ranked) < limit:
+        limit = ft_length(ranked)
+
     while idx < limit:
         (feat1, feat2), corr = ranked[idx]
         print(f"  {i}. {feat1:30s} <-> {feat2:30s} : r={corr:.6f}")
@@ -186,7 +178,6 @@ def main():
         idx += 1
     print("="*70 + "\n")
     
-    # Afficher les scatter plots
     plot_scatter(feature_data, most_similar, correlations)
 
 

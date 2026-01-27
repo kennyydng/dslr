@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Script histogram - Affiche un histogramme pour trouver le cours avec
-la distribution de scores la plus homogène entre les quatre maisons
-"""
-
 import sys
 import csv
 import matplotlib.pyplot as plt
@@ -44,7 +39,6 @@ def parse_float(value):
 
 def get_course_scores_by_house(data):
     """Extrait les scores de chaque cours par maison"""
-    # Liste des cours à analyser
     courses = [
         'Arithmancy', 'Astronomy', 'Herbology', 
         'Defense Against the Dark Arts', 'Divination',

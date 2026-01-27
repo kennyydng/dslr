@@ -240,13 +240,8 @@ def main():
         i += 1
     print("=" * 70 + "\n")
 
-    # Correlation matrix on all features
-    columns, _ = build_columns(data, NUMERIC_FEATURES)
-    print("Affichage de la matrice de corrélation...")
-    plot_full_correlation_matrix(columns, NUMERIC_FEATURES)
-
     # Pair plot on selected features
-    print("Création du pair plot (manual)...")
+    print("Création du pair plot pour visualiser les features sélectionnées...")
     plot_pair_plot(data, top_features)
 
 
