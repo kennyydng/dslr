@@ -8,7 +8,7 @@ import sys
 import json
 import random
 
-sys.path.insert(0, '../src')
+sys.path.insert(0, 'src')
 from math_utils import (
     ft_sqrt, ft_exp, ft_log, parse_float, read_csv
 )

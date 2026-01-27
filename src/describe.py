@@ -34,17 +34,13 @@ def extract_numeric_data(headers, data):
     numeric_data = {}
     excluded_columns = {'Index', 'First Name', 'Last Name', 'Birthday', 'Best Hand', 'Hogwarts House'}
     
-    for col_idx, header in enumerate(headers):
+    for header in headers:
         if header in excluded_columns:
             continue
         column_values = []
         
         for row in data:
-            try:
-                raw = row[col_idx]
-            except IndexError:
-                continue
-
+            raw = row.get(header, '')
             value = parse_float(raw)
             if value is not None:
                 column_values.append(value)
@@ -225,7 +221,11 @@ def main():
         sys.exit(1)
     
     filepath = sys.argv[1]
-    headers, data = read_csv(filepath)
+    data = read_csv(filepath)
+    
+    # Extraire les headers depuis les clés du premier dictionnaire
+    headers = list(data[0].keys()) if data else []
+    
     numeric_data = extract_numeric_data(headers, data)
     stats = calculate_statistics(numeric_data)
     display_statistics(stats)
