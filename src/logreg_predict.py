@@ -8,30 +8,10 @@ import sys
 import csv
 import json
 
-from utils import clamp, ft_length, argmax_dict, count_occurrences, ft_sum, ft_exp
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
+from utils import (
+    clamp, ft_length, argmax_dict, count_occurrences, ft_sum, ft_exp, 
+    parse_float, read_csv, sigmoid, predict_probability
+)
 
 
 def load_weights(filepath):
@@ -47,23 +27,6 @@ def load_weights(filepath):
     except Exception as e:
         print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
         sys.exit(1)
-
-
-def sigmoid(z):
-    """Fonction sigmoïde"""
-    z = clamp(z, -500, 500)
-    return 1.0 / (1.0 + ft_exp(-z))
-
-
-def predict_probability(X, weights):
-    """Calcule la probabilité avec la régression logistique"""
-    z = weights[0]  # Biais
-    i = 0
-    n = ft_length(X)
-    while i < n:
-        z += weights[i + 1] * X[i]
-        i += 1
-    return sigmoid(z)
 
 
 def normalize_features(features, means, stds):

@@ -3,9 +3,7 @@
 Script scatter_plot - Affiche un scatter plot pour trouver
 les deux features les plus similaires
 """
-
 import sys
-import csv
 import matplotlib.pyplot as plt
 from itertools import combinations
 
@@ -14,31 +12,9 @@ from utils import (
     ft_length,
     pearson_corr,
     sort_pairs_by_value,
+    parse_float,
+    read_csv
 )
-
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
 
 def extract_features(data):
     """Extrait les features numériques"""
@@ -63,11 +39,6 @@ def extract_features(data):
     return feature_data
 
 
-def calculate_correlation(x, y):
-    """Calcule le coefficient de corrélation de Pearson"""
-    return pearson_corr(x, y)
-
-
 def find_most_correlated_features(feature_data):
     """Trouve les deux features les plus corrélées"""
     features = list(feature_data.keys())
@@ -77,7 +48,7 @@ def find_most_correlated_features(feature_data):
         x = feature_data[feat1]
         y = feature_data[feat2]
         
-        corr = calculate_correlation(x, y)
+        corr = pearson_corr(x, y)
         correlations[(feat1, feat2)] = abs(corr)
     
     # Trouver la paire avec la plus forte corrélation

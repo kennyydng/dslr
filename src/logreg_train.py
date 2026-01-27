@@ -1,133 +1,10 @@
 #!/usr/bin/env python3
-"""
-logreg_train - Entraînement de modèles de régression logistique one-vs-all
-pour prédire la maison de Poudlard des étudiants
-"""
-
 import sys
-import csv
-import json
 
-from utils import clamp, ft_length, ft_sum, ft_mean, ft_std, is_nan, ft_exp, ft_log
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def extract_features_and_labels(data, selected_features):
-    """Extrait les features et labels du dataset"""
-    houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
-    
-    X = []
-    y = []
-    
-    for row in data:
-        house = row.get('Hogwarts House')
-        if house not in houses:
-            continue
-        
-        # Extraire les features
-        features = []
-        valid = True
-        for feature in selected_features:
-            value = parse_float(row.get(feature))
-            if value is None:
-                valid = False
-                break
-            features.append(value)
-        
-        if valid:
-            X.append(features)
-            y.append(house)
-    
-    return X, y
-
-
-def normalize_features(X):
-    """Normalise les features (standardisation)"""
-    n_features = ft_length(X[0])
-    means = []
-    stds = []
-    
-    # Calculer moyenne et écart-type pour chaque feature
-    for j in range(n_features):
-        values = []
-        for row in X:
-            values.append(row[j])
-
-        m = ft_mean(values)
-        s = ft_std(values)
-        if is_nan(s) or s == 0.0:
-            s = 1.0
-
-        means.append(m)
-        stds.append(s)
-    
-    # Normaliser
-    X_normalized = []
-    for row in X:
-        normalized_row = []
-        j = 0
-        while j < n_features:
-            normalized_row.append((row[j] - means[j]) / stds[j])
-            j += 1
-        X_normalized.append(normalized_row)
-    
-    return X_normalized, means, stds
-
-
-def sigmoid(z):
-    """Fonction sigmoïde"""
-    # Clipper pour éviter l'overflow
-    z = clamp(z, -500, 500)
-    return 1.0 / (1.0 + ft_exp(-z))
-
-
-def predict_probability(X, weights):
-    """Calcule la probabilité avec la régression logistique"""
-    # z = w0 + w1*x1 + w2*x2 + ... (weights[0] est le biais)
-    z = weights[0]  # Biais
-    i = 0
-    n = ft_length(X)
-    while i < n:
-        z += weights[i + 1] * X[i]
-        i += 1
-    return sigmoid(z)
-
-
-def compute_cost(X, y_binary, weights):
-    """Calcule le coût (log loss)"""
-    m = ft_length(X)
-    total_cost = 0.0
-    
-    for i in range(m):
-        h = predict_probability(X[i], weights)
-        # Éviter log(0)
-        h = clamp(h, 1e-15, 1 - 1e-15)
-        cost = -y_binary[i] * ft_log(h) - (1 - y_binary[i]) * ft_log(1 - h)
-        total_cost += cost
-    
-    return total_cost / m
+from utils import (
+    ft_length, read_csv, normalize_features, predict_probability,
+    compute_cost, extract_features_and_labels, save_weights
+)
 
 
 def gradient_descent(X, y_binary, learning_rate=0.1, iterations=1000):
@@ -198,23 +75,6 @@ def train_one_vs_all(X, y, houses, learning_rate=0.1, iterations=1000):
         print(f"  Précision sur training set: {accuracy:.2f}%")
     
     return models
-
-
-def save_weights(models, means, stds, selected_features, filepath='weights.json'):
-    """Sauvegarde les poids et paramètres de normalisation"""
-    data = {
-        'features': selected_features,
-        'normalization': {
-            'means': means,
-            'stds': stds
-        },
-        'models': {house: weights for house, weights in models.items()}
-    }
-    
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
-    
-    print(f"\n✓ Poids sauvegardés dans '{filepath}'")
 
 
 def main():

@@ -11,31 +11,9 @@ from utils import (
     ft_mean,
     sort_pairs_by_value,
     ft_variance,
+    parse_float,
+    read_csv
 )
-
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les headers et les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
 
 def get_course_scores_by_house(data):
     """Extrait les scores de chaque cours par maison"""

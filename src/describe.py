@@ -14,23 +14,9 @@ from utils import (
     ft_mean,
     ft_std,
     parse_float,
+    read_csv
 )
 
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les headers et les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.reader(f)
-            headers = next(reader)
-            data = list(reader)
-        return headers, data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
 
 
 def format_col_name(name):

@@ -10,115 +10,10 @@ import json
 import random
 
 sys.path.insert(0, '../src')
-from utils import ft_sqrt, ft_exp, ft_log, ft_ceil
-
-
-def parse_float(value):
-    """Convertit une valeur en float, retourne None si impossible"""
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def read_csv(filepath):
-    """Lit un fichier CSV et retourne les données"""
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-def extract_features_and_labels(data, selected_features):
-    """Extrait les features et labels du dataset"""
-    houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
-    
-    X = []
-    y = []
-    
-    for row in data:
-        house = row.get('Hogwarts House')
-        if house not in houses:
-            continue
-        
-        # Extraire les features
-        features = []
-        valid = True
-        for feature in selected_features:
-            value = parse_float(row.get(feature))
-            if value is None:
-                valid = False
-                break
-            features.append(value)
-        
-        if valid:
-            X.append(features)
-            y.append(house)
-    
-    return X, y
-
-
-def normalize_features(X):
-    """Normalise les features (standardisation)"""
-    n_features = len(X[0])
-    means = []
-    stds = []
-    
-    # Calculer moyenne et écart-type pour chaque feature
-    for j in range(n_features):
-        values = [row[j] for row in X]
-        mean = sum(values) / len(values)
-        variance = sum((x - mean) ** 2 for x in values) / len(values)
-        std = ft_sqrt(variance) if variance > 0 else 1.0
-        
-        means.append(mean)
-        stds.append(std)
-    
-    # Normaliser
-    X_normalized = []
-    for row in X:
-        normalized_row = [(row[j] - means[j]) / stds[j] for j in range(n_features)]
-        X_normalized.append(normalized_row)
-    
-    return X_normalized, means, stds
-
-
-def sigmoid(z):
-    """Fonction sigmoïde"""
-    # Clipper pour éviter l'overflow
-    z = max(-500, min(500, z))
-    return 1.0 / (1.0 + ft_exp(-z))
-
-
-def predict_probability(X, weights):
-    """Calcule la probabilité avec la régression logistique"""
-    # z = w0 + w1*x1 + w2*x2 + ... (weights[0] est le biais)
-    z = weights[0]  # Biais
-    for i in range(len(X)):
-        z += weights[i + 1] * X[i]
-    return sigmoid(z)
-
-
-def compute_cost(X, y_binary, weights):
-    """Calcule le coût (log loss)"""
-    m = len(X)
-    total_cost = 0.0
-    
-    for i in range(m):
-        h = predict_probability(X[i], weights)
-        # Éviter log(0)
-        h = max(1e-15, min(1 - 1e-15, h))
-        cost = -y_binary[i] * ft_log(h) - (1 - y_binary[i]) * ft_log(1 - h)
-        total_cost += cost
-    
-    return total_cost / m
+from utils import (
+    ft_sqrt, ft_exp, ft_log, ft_ceil, parse_float, normalize_features,
+    sigmoid, predict_probability, compute_cost, extract_features_and_labels, save_weights
+)
 
 
 def create_mini_batches(X, y_binary, batch_size):
@@ -228,22 +123,6 @@ def train_one_vs_all(X, y, houses, learning_rate=0.1, epochs=100, batch_size=32)
     return models
 
 
-def save_weights(models, means, stds, selected_features, filepath='weights_minibatch.json'):
-    """Sauvegarde les poids et paramètres de normalisation"""
-    data = {
-        'features': selected_features,
-        'normalization': {
-            'means': means,
-            'stds': stds
-        },
-        'models': {house: weights for house, weights in models.items()},
-        'method': 'Mini-Batch GD'
-    }
-    
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
-    
-    print(f"\n✓ Poids sauvegardés dans '{filepath}'")
 
 
 def main():
@@ -305,7 +184,7 @@ def main():
     models = train_one_vs_all(X_normalized, y, houses, learning_rate, epochs, batch_size)
     
     # Sauvegarder les poids
-    save_weights(models, means, stds, selected_features)
+    save_weights(models, means, stds, selected_features, 'weights_minibatch.json')
     
     print("\n" + "="*70)
     print("ENTRAÎNEMENT TERMINÉ")

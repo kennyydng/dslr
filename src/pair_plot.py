@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""pair_plot - Pair plot + scoring de features (version manuelle).
-
-Cette version évite pandas/numpy/seaborn et n'utilise pas de fonctions qui font les
-statistiques "toutes seules" (mean/var/corr/describe). Les calculs sont faits via
-les helpers manuels dans utils.py.
-"""
-
 import sys
 import csv
 import matplotlib.pyplot as plt
@@ -16,6 +9,8 @@ from utils import (
     ft_variance,
     pearson_corr,
     sort_pairs_by_value,
+    parse_float,
+    read_csv
 )
 
 
@@ -27,26 +22,6 @@ NUMERIC_FEATURES = [
     'Transfiguration', 'Potions', 'Care of Magical Creatures',
     'Charms', 'Flying'
 ]
-
-
-def parse_float(value):
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def read_csv(filepath):
-    try:
-        with open(filepath, 'r') as f:
-            reader = csv.DictReader(f)
-            return list(reader)
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{filepath}' n'existe pas.", file=sys.stderr)
-        sys.exit(1)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier: {e}", file=sys.stderr)
-        sys.exit(1)
 
 
 def build_columns(data, features):
@@ -65,7 +40,6 @@ def build_columns(data, features):
 
 def analyze_feature_importance(data, features):
     """Score = variance(means_by_house) / mean(variances_by_house)."""
-
     feature_scores = {}
 
     for feat in features:
@@ -104,7 +78,6 @@ def analyze_feature_importance(data, features):
 
 def plot_full_correlation_matrix(columns, features):
     """Correlation matrix computed manually, displayed with matplotlib."""
-
     n = ft_length(features)
     matrix = []
     i = 0
