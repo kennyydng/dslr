@@ -8,10 +8,11 @@ import sys
 import csv
 import json
 
-from utils import (
-    clamp, ft_length, argmax_dict, count_occurrences, ft_sum, ft_exp, 
-    parse_float, read_csv, sigmoid, predict_probability
+from math_utils import (
+    ft_length, argmax_dict, count_occurrences, ft_sum, ft_exp, 
+    parse_float, read_csv
 )
+from ml_utils import predict_probability, normalize_features_with_params
 
 
 def load_weights(filepath):
@@ -29,21 +30,10 @@ def load_weights(filepath):
         sys.exit(1)
 
 
-def normalize_features(features, means, stds):
-    """Normalise les features avec les paramètres d'entraînement"""
-    normalized = []
-    i = 0
-    n = ft_length(features)
-    while i < n:
-        normalized.append((features[i] - means[i]) / stds[i])
-        i += 1
-    return normalized
-
-
 def predict_house(features, models, means, stds):
     """Prédit la maison en utilisant tous les modèles (one-vs-all)"""
-    # Normaliser les features
-    features_normalized = normalize_features(features, means, stds)
+    # Normaliser les features avec les paramètres d'entraînement
+    features_normalized = normalize_features_with_params(features, means, stds)
     
     # Calculer les probabilités pour chaque maison
     probabilities = {}
@@ -114,37 +104,33 @@ def visualize_predictions(predictions_list, dataset_file=None):
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
         
         # Graphique 1: Prédictions
-        bars1 = ax1.bar(houses, pred_values, color=colors, edgecolor='black', linewidth=1.5)
+        ax1.bar(houses, pred_values, color=colors, edgecolor='black', linewidth=1.5)
         ax1.set_title('Prédictions', fontsize=14, fontweight='bold')
         ax1.set_ylabel('Nombre d\'étudiants', fontsize=12)
         ax1.set_xlabel('Maison', fontsize=12)
         ax1.grid(axis='y', alpha=0.3)
         
-        for bar in bars1:
-            height = bar.get_height()
-            ax1.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{int(height)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+        for i, (house, val) in enumerate(zip(houses, pred_values)):
+            ax1.text(i, val, f'{int(val)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
         # Graphique 2: Vraies valeurs
-        bars2 = ax2.bar(houses, true_values, color=colors, edgecolor='black', linewidth=1.5)
+        ax2.bar(houses, true_values, color=colors, edgecolor='black', linewidth=1.5)
         ax2.set_title('Vraies Valeurs', fontsize=14, fontweight='bold')
         ax2.set_ylabel('Nombre d\'étudiants', fontsize=12)
         ax2.set_xlabel('Maison', fontsize=12)
         ax2.grid(axis='y', alpha=0.3)
         
-        for bar in bars2:
-            height = bar.get_height()
-            ax2.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{int(height)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+        for i, (house, val) in enumerate(zip(houses, true_values)):
+            ax2.text(i, val, f'{int(val)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
         # Graphique 3: Comparaison
         x = range(ft_length(houses))
         width = 0.35
         
-        bars3a = ax3.bar([i - width/2 for i in x], true_values, width, 
+        ax3.bar([i - width/2 for i in x], true_values, width, 
                         label='Vraies valeurs', color=colors, alpha=0.7, 
                         edgecolor='black', linewidth=1.5)
-        bars3b = ax3.bar([i + width/2 for i in x], pred_values, width,
+        ax3.bar([i + width/2 for i in x], pred_values, width,
                         label='Prédictions', color=colors, alpha=0.4,
                         edgecolor='black', linewidth=1.5, hatch='//')
         
@@ -163,16 +149,14 @@ def visualize_predictions(predictions_list, dataset_file=None):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         
         # Graphique en barres
-        bars = ax1.bar(houses, pred_values, color=colors, edgecolor='black', linewidth=1.5)
+        ax1.bar(houses, pred_values, color=colors, edgecolor='black', linewidth=1.5)
         ax1.set_title('Répartition des Prédictions', fontsize=14, fontweight='bold')
         ax1.set_ylabel('Nombre d\'étudiants', fontsize=12)
         ax1.set_xlabel('Maison', fontsize=12)
         ax1.grid(axis='y', alpha=0.3)
         
-        for bar in bars:
-            height = bar.get_height()
-            ax1.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{int(height)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+        for i, (house, val) in enumerate(zip(houses, pred_values)):
+            ax1.text(i, val, f'{int(val)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
         # Graphique en camembert
         ax2.pie(pred_values, labels=houses, colors=colors, autopct='%1.1f%%',
@@ -284,15 +268,9 @@ def main():
             features.append(value)
         
         if valid:
-            # Prédire la maison
             house = predict_house(features, models, means, stds)
             predictions.append((index, house))
             valid_predictions += 1
-        else:
-            # Si des valeurs manquent, prédire "Unknown" ou la maison la plus probable par défaut
-            predictions.append((index, "Gryffindor"))  # Défaut
-    
-    print(f"  → {valid_predictions}/{data_n} prédictions valides")
     
     # Sauvegarder les résultats
     print("\nSauvegarde des prédictions...")

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import sys
-import csv
 
-from utils import (
+from math_utils import (
     ft_length,
     ft_min,
     ft_max,
@@ -16,8 +15,6 @@ from utils import (
     parse_float,
     read_csv
 )
-
-
 
 def format_col_name(name):
     """Change le format des noms de colonnes trop longs"""

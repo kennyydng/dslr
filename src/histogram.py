@@ -3,7 +3,7 @@ import sys
 import csv
 import matplotlib.pyplot as plt
 
-from utils import (
+from math_utils import (
     argmin_dict,
     ft_length,
     ft_max,

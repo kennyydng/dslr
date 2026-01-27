@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import sys
 
-from utils import (
-    ft_length, read_csv, normalize_features, predict_probability,
+from math_utils import ft_length, read_csv
+from ml_utils import (
+    normalize_features, predict_probability,
     compute_cost, extract_features_and_labels, save_weights
 )
 

@@ -7,14 +7,14 @@ import sys
 import matplotlib.pyplot as plt
 from itertools import combinations
 
-from utils import (
+from math_utils import (
     argmax_dict,
     ft_length,
-    pearson_corr,
     sort_pairs_by_value,
     parse_float,
     read_csv
 )
+from ml_utils import pearson_corr
 
 def extract_features(data):
     """Extrait les features numériques"""

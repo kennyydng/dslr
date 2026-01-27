@@ -10,9 +10,12 @@ import json
 import random
 
 sys.path.insert(0, '../src')
-from utils import (
-    ft_sqrt, ft_exp, ft_log, ft_ceil, parse_float, normalize_features,
-    sigmoid, predict_probability, compute_cost, extract_features_and_labels, save_weights
+from math_utils import (
+    ft_sqrt, ft_exp, ft_log, ft_ceil, parse_float, read_csv
+)
+from ml_utils import (
+    normalize_features, sigmoid, predict_probability, 
+    compute_cost, extract_features_and_labels, save_weights
 )
 
 

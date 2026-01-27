@@ -3,15 +3,15 @@ import sys
 import csv
 import matplotlib.pyplot as plt
 
-from utils import (
+from math_utils import (
     ft_length,
     ft_mean,
     ft_variance,
-    pearson_corr,
     sort_pairs_by_value,
     parse_float,
     read_csv
 )
+from ml_utils import pearson_corr
 
 
 HOUSES = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
