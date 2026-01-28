@@ -68,7 +68,6 @@ def train_one_vs_all(X, y, houses, learning_rate=0.1, iterations=1000):
 
 
 def main():
-    """Fonction principale"""
     if ft_length(sys.argv) != 2:
         print("Usage: python logreg_train.py <dataset_train.csv>", file=sys.stderr)
         sys.exit(1)
@@ -97,10 +96,7 @@ def main():
     X, y = extract_features_and_labels(data, selected_features)
     print(f"  → {ft_length(X)} exemples valides après nettoyage")
     
-    print("\nNormalisation des features...")
     X_normalized, means, stds = normalize_features(X)
-    print("  → Normalisation terminée")
-    
     houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
     learning_rate = 0.5
     iterations = 1000
@@ -110,9 +106,6 @@ def main():
     print(f"  - Itérations: {iterations}")
     models = train_one_vs_all(X_normalized, y, houses, learning_rate, iterations)
     save_weights(models, means, stds, selected_features)
-    print("\n" + "="*70)
-    print("ENTRAÎNEMENT TERMINÉ")
-    print("="*70)
 
 
 if __name__ == "__main__":

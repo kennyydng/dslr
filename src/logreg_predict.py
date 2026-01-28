@@ -168,13 +168,13 @@ def visualize_predictions(predictions_list, dataset_file=None):
     if true_labels:
         print("\nPRÉDICTIONS:")
     
-    total_pred = ft_sum(pred_values)
+    total_pred = int(ft_sum(pred_values))
     i = 0
     n = ft_length(houses)
 
     while i < n:
         house = houses[i]
-        count = pred_values[i]
+        count = int(pred_values[i])
         percentage = (count / total_pred * 100) if total_pred > 0 else 0
         print(f"  {house:15s} : {count:4d} étudiants ({percentage:5.2f}%)")
         i += 1
@@ -183,12 +183,12 @@ def visualize_predictions(predictions_list, dataset_file=None):
     
     if true_labels:
         print("\nVRAIES VALEURS:")
-        total_true = ft_sum(true_values)
+        total_true = int(ft_sum(true_values))
         i = 0
         n = ft_length(houses)
         while i < n:
             house = houses[i]
-            count = true_values[i]
+            count = int(true_values[i])
             percentage = (count / total_true * 100) if total_true > 0 else 0
             print(f"  {house:15s} : {count:4d} étudiants ({percentage:5.2f}%)")
             i += 1
@@ -210,7 +210,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
 
 
 def main():
-    """Fonction principale"""
     if ft_length(sys.argv) != 3:
         print("Usage: python logreg_predict.py <dataset_test.csv> <weights.json>", file=sys.stderr)
         sys.exit(1)
@@ -238,9 +237,7 @@ def main():
     data_n = ft_length(data)
     print(f"  → {data_n} lignes chargées")
     
-    print("\nPrédiction en cours...")
     predictions = []
-    valid_predictions = 0
     
     for row in data:
         index = row.get('Index')
@@ -257,31 +254,9 @@ def main():
         if valid:
             house = predict_house(features, models, means, stds)
             predictions.append((index, house))
-            valid_predictions += 1
     
     print("\nSauvegarde des prédictions...")
     save_predictions(predictions)
-    
-    print("\nÉchantillon des prédictions:")
-    print(f"{'Index':<10} {'Maison Prédite'}")
-    print("-" * 30)
-    pred_n = ft_length(predictions)
-    limit = 10
-    if pred_n < limit:
-        limit = pred_n
-    i = 0
-    while i < limit:
-        index, house = predictions[i]
-        print(f"{index:<10} {house}")
-        i += 1
-    if pred_n > 10:
-        print("...")
-    
-    print("\n" + "="*70)
-    print("PRÉDICTION TERMINÉE")
-    print("="*70)
-    
-    print("\nAffichage de la visualisation...")
     visualize_predictions(predictions, dataset_file)
 
 
