@@ -138,14 +138,6 @@ def normalize_features_with_params(features, means, stds):
 
 def sigmoid(z):
     """Fonction sigmoïde : convertit un score linéaire en probabilité [0, 1].
-    
-    Formule: σ(z) = 1 / (1 + e^(-z))
-    
-    Propriétés:
-    - σ(0) = 0.5
-    - σ(+∞) → 1
-    - σ(-∞) → 0
-    
     Le clipping évite les overflow numériques lors du calcul de e^(-z).
     """
     z = clamp(z, -500, 500)  # Éviter overflow avec e^(très grand nombre)
@@ -154,9 +146,7 @@ def sigmoid(z):
 
 def predict_probability(X, weights):
     """Calcule la probabilité avec la régression logistique.
-    
-    Formule: P(y=1|X) = σ(w0 + w1*x1 + w2*x2 + ... + wn*xn)
-    
+
     Args:
         X: Features d'un exemple (liste de valeurs)
         weights: Poids du modèle [biais, w1, w2, ..., wn]
@@ -175,9 +165,7 @@ def predict_probability(X, weights):
 
 def compute_cost(X, y_binary, weights):
     """Calcule le coût (log loss) pour la régression logistique.
-    
-    Formule: L = -1/m * Σ[y*log(h) + (1-y)*log(1-h)]
-    
+
     Plus le coût est faible, meilleur est le modèle.
     
     Args:

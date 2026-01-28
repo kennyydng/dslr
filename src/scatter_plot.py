@@ -59,9 +59,6 @@ def find_most_correlated_features(feature_data):
 
 def plot_scatter(feature_data, most_similar, correlations):
     """Affiche les scatter plots"""
-    features = list(feature_data.keys())
-    
-    # Créer une figure pour les paires les plus corrélées
     fig = plt.figure(figsize=(16, 10))
     fig.suptitle('Scatter Plots - Recherche de features similaires', fontsize=16)
     
@@ -130,8 +127,7 @@ def main():
     print("ANALYSE DE SIMILARITÉ ENTRE FEATURES")
     print("="*70)
     print(f"\nLes deux features les plus similaires:")
-    print(f"  → {most_similar[0]}")
-    print(f"  → {most_similar[1]}")
+    print(f"  → {most_similar[0]} vs {most_similar[1]}")
     print(f"  → Corrélation: {correlations[most_similar]:.6f}")
     print("\nTop 10 des paires les plus corrélées:")
     ranked = sort_pairs_by_value(list(correlations.items()), reverse=True)

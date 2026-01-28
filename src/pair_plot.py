@@ -195,26 +195,22 @@ def main():
     scores = analyze_feature_importance(data, NUMERIC_FEATURES)
     ranked = sort_pairs_by_value(list(scores.items()), reverse=True)
 
-    top_n = 6
-    if ft_length(ranked) < top_n:
-        top_n = ft_length(ranked)
-
     top_features = []
     print("\n" + "=" * 70)
     print("FEATURES SÉLECTIONNÉES POUR LE PAIR PLOT")
     print("=" * 70)
     idx = 0
     i = 1
-    while idx < top_n:
+    while ft_length(top_features) < 5 and idx < ft_length(ranked):
         feat, score = ranked[idx]
-        top_features.append(feat)
-        print(f"  {i}. {feat:40s} : score = {score:.6f}")
+        # Exclure Defense Against the Dark Arts
+        if feat != 'Defense Against the Dark Arts':
+            top_features.append(feat)
+            print(f"  {i}. {feat:40s} : score = {score:.6f}")
+            i += 1
         idx += 1
-        i += 1
     print("=" * 70 + "\n")
 
-    # Pair plot on selected features
-    print("Création du pair plot pour visualiser les features sélectionnées...")
     plot_pair_plot(data, top_features)
 
 

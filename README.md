@@ -170,7 +170,7 @@ Le script affiche un graphique avec **12 scatter plots** :
 Ces deux features sont **parfaitement corrélées linéairement** :
 - Quand Astronomy augmente d'1 point, Defense augmente proportionnellement
 - Elles contiennent exactement la même information
-- **Conclusion** : on peut en supprimer une sans perte d'information (évite la redondance)
+- **Conclusion** : Defense Against the Dark Arts a été supprimée du modèle final (redondance avec Astronomy)
 
 ### Utilité
 - ✅ **Détecter la multicolinéarité** : features r > 0.9 → redondance
@@ -235,13 +235,17 @@ Le script génère un **pair plot** (choix "pair plot" du sujet : *"pair plot OR
 
 **Pair plot des top 6 features sélectionnées** :
 
-**Top 6 features sélectionnées** :
-1. **Astronomy** : Score le plus élevé
-2. **Herbology** : Très discriminante
-3. **Defense Against the Dark Arts** : Corrélée avec Astronomy mais utile
-4. **Ancient Runes** : Bonne séparation
-5. **Charms** : Complète le top 5
-6. **(Une 6ème feature selon le score)**
+**Top 6 features identifiées (par score de séparabilité)** :
+1. **Defense Against the Dark Arts** : Score = 7.99 → ⚠️ Supprimée (corrélée à 100% avec Astronomy)
+2. **Astronomy** : Score = 7.97 → ✅ Gardée (#1 non-redondante)
+3. **Divination** : Score = 6.25 → ✅ Gardée (#2)
+4. **Charms** : Score = 6.22 → ✅ Gardée (#3)
+5. **Ancient Runes** : Score = 5.95 → ✅ Gardée (#4)
+6. **Flying** : Score = 5.42 → ✅ Gardée (#5)
+
+**→ 5 features finales utilisées** : Astronomy, Divination, Charms, Ancient Runes, Flying
+
+**Logique de sélection** : On prend le top 6 du classement, puis on supprime Defense Against the Dark Arts car elle est parfaitement corrélée avec Astronomy (r=1.0). Cela évite la multicolinéarité tout en conservant 5 features discriminantes.
 
 **Observations visuelles sur le pair plot** :
 - **Diagonale** : Histogrammes montrant la distribution de chaque feature par maison
@@ -252,20 +256,20 @@ Le script génère un **pair plot** (choix "pair plot" du sujet : *"pair plot OR
 ### Réponse à la question du sujet
 **"Which features are you going to use for your logistic regression?"**
 
-→ Les **5 meilleures features** : Astronomy, Herbology, Defense Against the Dark Arts, Ancient Runes, Charms
+→ Les **5 features retenues** : Astronomy, Divination, Charms, Ancient Runes, Flying
 
 **Justification visible dans le pair plot** :
 - ✅ **Score élevé** → variance inter-maisons >> variance intra-maisons
 - ✅ **Clusters visuellement séparés** → on voit 4 groupes de couleurs distincts
 - ✅ **Distributions différentes** → histogrammes décalés entre maisons
-- ✅ **Pas de redondance** → défense contre l'overfitting (on garde 5/13 features)
+- ✅ **Pas de redondance** → Defense supprimée (r=1.0 avec Astronomy), remplacée par les features suivantes du classement
 
 ### Utilité
 
 **Avant l'entraînement** :
 - ✅ Sélectionner les features les plus pertinentes (évite le sur-apprentissage)
 - ✅ Réduire la dimensionnalité (5/13 features suffisent)
-- ✅ Éliminer les features redondantes (corrélées)
+- ✅ Éliminer les features redondantes (Defense supprimée car r=1.0 avec Astronomy)
 
 **Analyse exploratoire** :
 - ✅ Visualiser les clusters par maison
@@ -300,7 +304,7 @@ Pour chaque maison H :
 - **Learning rate** : 0.5
 - **Époques** : 1000
 - **Mises à jour** : 1 par époque = **1000 total**
-- **Features** : 5 (Astronomy, Herbology, Defense, Ancient Runes, Charms)
+- **Features** : 5 (Astronomy, Divination, Charms, Ancient Runes, Flying)
 
 ### Résultat
 - **Fichier** : `weights.json`
@@ -411,12 +415,14 @@ Sur 400 test samples, le modèle prédit correctement >392 maisons.
 38 élèves ignorés (362/400 prédictions) car features manquantes.
 
 ### Features sélectionnées (5/13)
-Seules les 5 features les plus discriminantes sont utilisées :
-1. Astronomy
-2. Herbology
-3. Defense Against the Dark Arts
-4. Ancient Runes
-5. Charms
+Les 5 features les plus discriminantes et non-redondantes sont utilisées :
+1. Astronomy (score = 7.97)
+2. Divination (score = 6.25)
+3. Charms (score = 6.22)
+4. Ancient Runes (score = 5.95)
+5. Flying (score = 5.42)
+
+(Defense Against the Dark Arts supprimée car parfaitement corrélée avec Astronomy)
 
 → Réduit le sur-apprentissage et améliore la généralisation.
 

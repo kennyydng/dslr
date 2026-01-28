@@ -75,12 +75,14 @@ def main():
     filepath = sys.argv[1]
     
     # Features sélectionnées (basées sur l'analyse du pair_plot)
+    # Top 6 : Defense (7.99), Astronomy (7.97), Divination (6.25), Charms (6.22), Ancient Runes (5.95), Flying (5.42)
+    # Defense supprimée car corrélée à 100% avec Astronomy → on prend les 5 autres
     selected_features = [
-        'Astronomy',
-        'Herbology',
-        'Defense Against the Dark Arts',
-        'Ancient Runes',
-        'Charms'
+        'Astronomy',      # #2 : score = 7.97
+        'Divination',     # #3 : score = 6.25
+        'Charms',         # #4 : score = 6.22
+        'Ancient Runes',  # #5 : score = 5.95
+        'Flying'          # #6 : score = 5.42
     ]
     
     print("="*70)
