@@ -32,16 +32,13 @@ def load_weights(filepath):
 
 def predict_house(features, models, means, stds):
     """Prédit la maison en utilisant tous les modèles (one-vs-all)"""
-    # Normaliser les features avec les paramètres d'entraînement
     features_normalized = normalize_features_with_params(features, means, stds)
     
-    # Calculer les probabilités pour chaque maison
     probabilities = {}
     for house, weights in models.items():
         prob = predict_probability(features_normalized, weights)
         probabilities[house] = prob
     
-    # Retourner la maison avec la probabilité la plus élevée
     predicted_house = argmax_dict(probabilities)
     return predicted_house
 
@@ -68,18 +65,15 @@ def visualize_predictions(predictions_list, dataset_file=None):
     houses = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff']
     colors = ['#d32f2f', '#43a047', '#1976d2', '#fdd835']
     
-    # Extraire les prédictions
     predictions = []
     for _, house in predictions_list:
         predictions.append(house)
     
-    # Compter les prédictions
     pred_counts = count_occurrences(predictions)
     pred_values = []
     for house in houses:
         pred_values.append(pred_counts.get(house, 0))
     
-    # Charger les vraies valeurs si disponibles
     true_labels = None
     if dataset_file:
         try:
@@ -95,7 +89,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
             true_labels = None
     
     if true_labels:
-        # Si on a les vraies valeurs, les afficher aussi
         true_counts = count_occurrences(true_labels)
         true_values = []
         for house in houses:
@@ -148,7 +141,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
         # Seulement les prédictions
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
         
-        # Graphique en barres
         ax1.bar(houses, pred_values, color=colors, edgecolor='black', linewidth=1.5)
         ax1.set_title('Répartition des Prédictions', fontsize=14, fontweight='bold')
         ax1.set_ylabel('Nombre d\'étudiants', fontsize=12)
@@ -158,7 +150,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
         for i, (house, val) in enumerate(zip(houses, pred_values)):
             ax1.text(i, val, f'{int(val)}', ha='center', va='bottom', fontsize=10, fontweight='bold')
         
-        # Graphique en camembert
         ax2.pie(pred_values, labels=houses, colors=colors, autopct='%1.1f%%',
                startangle=90, textprops={'fontsize': 11, 'fontweight': 'bold'},
                wedgeprops={'edgecolor': 'black', 'linewidth': 1.5})
@@ -170,7 +161,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
     plt.tight_layout()
     plt.show()
     
-    # Afficher les statistiques
     print("\n" + "="*70)
     print("STATISTIQUES DE RÉPARTITION")
     print("="*70)
@@ -181,12 +171,14 @@ def visualize_predictions(predictions_list, dataset_file=None):
     total_pred = ft_sum(pred_values)
     i = 0
     n = ft_length(houses)
+
     while i < n:
         house = houses[i]
         count = pred_values[i]
         percentage = (count / total_pred * 100) if total_pred > 0 else 0
         print(f"  {house:15s} : {count:4d} étudiants ({percentage:5.2f}%)")
         i += 1
+
     print(f"  {'TOTAL':15s} : {total_pred:4d} étudiants")
     
     if true_labels:
@@ -202,7 +194,6 @@ def visualize_predictions(predictions_list, dataset_file=None):
             i += 1
         print(f"  {'TOTAL':15s} : {total_true:4d} étudiants")
         
-        # Calculer la précision si possible
         pred_n = ft_length(predictions)
         true_n = ft_length(true_labels)
         if pred_n == true_n:
@@ -231,7 +222,6 @@ def main():
     print("PRÉDICTION DES MAISONS - RÉGRESSION LOGISTIQUE")
     print("="*70)
     
-    # Charger les poids
     print(f"\nChargement des poids: {weights_file}")
     weights_data = load_weights(weights_file)
     
@@ -243,23 +233,20 @@ def main():
     print(f"  → Features: {', '.join(selected_features)}")
     print(f"  → Modèles chargés: {', '.join(models.keys())}")
     
-    # Lire le dataset de test
     print(f"\nChargement du dataset: {dataset_file}")
     data = read_csv(dataset_file)
     data_n = ft_length(data)
     print(f"  → {data_n} lignes chargées")
     
-    # Faire les prédictions
     print("\nPrédiction en cours...")
     predictions = []
     valid_predictions = 0
     
     for row in data:
         index = row.get('Index')
-        
-        # Extraire les features
         features = []
         valid = True
+
         for feature in selected_features:
             value = parse_float(row.get(feature))
             if value is None:
@@ -272,11 +259,9 @@ def main():
             predictions.append((index, house))
             valid_predictions += 1
     
-    # Sauvegarder les résultats
     print("\nSauvegarde des prédictions...")
     save_predictions(predictions)
     
-    # Afficher un échantillon des prédictions
     print("\nÉchantillon des prédictions:")
     print(f"{'Index':<10} {'Maison Prédite'}")
     print("-" * 30)
@@ -296,7 +281,6 @@ def main():
     print("PRÉDICTION TERMINÉE")
     print("="*70)
     
-    # Visualiser automatiquement
     print("\nAffichage de la visualisation...")
     visualize_predictions(predictions, dataset_file)
 

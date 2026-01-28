@@ -13,7 +13,6 @@ BATCH ?= 64
 help:
 	@echo "Usage: make <target>"
 	@echo "Main:    venv install describe histogram scatter pairplot train predict"
-	@echo "Bonus:   bonus-sgd bonus-minibatch bonus-compare bonus-run"
 	@echo "Cleanup: clean clean-venv"
 	@echo "Vars (optional overrides):"
 	@echo "  TRAIN_DATA=... TEST_DATA=... WEIGHTS=... BATCH=... VENV_DIR=..."
@@ -43,17 +42,8 @@ train:
 predict: 
 	$(PY) src/logreg_predict.py $(TEST_DATA) $(WEIGHTS)
 
-bonus-sgd: 
-	$(PY) bonus/logreg_train_sgd.py $(TRAIN_DATA)
-
-bonus-minibatch: 
-	$(PY) bonus/logreg_train_minibatch.py $(TRAIN_DATA) $(BATCH)
-
-bonus-compare: 
-	$(PY) bonus/compare_methods.py
-
 clean:
-	rm -f houses.csv $(WEIGHTS) weights_sgd.json weights_minibatch.json
+	rm -f houses.csv $(WEIGHTS)
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 
 clean-venv:
