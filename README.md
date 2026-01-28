@@ -360,121 +360,6 @@ Les élèves avec features manquantes sont **ignorés** → 362 prédictions sur
 
 ---
 
-## 🚀 Bonus 1 : SGD - `logreg_train_sgd.py`
-
-### Fonction
-Entraîne avec **Stochastic Gradient Descent** (mise à jour après chaque exemple).
-
-### Algorithme
-
-```
-Pour 100 époques :
-  1. Mélanger aléatoirement les exemples (shuffle)
-  2. Pour chaque exemple (x, y) :
-     a. Calculer la prédiction : σ(w·x)
-     b. Calculer le gradient sur CET exemple
-     c. Mettre à jour immédiatement : w = w - α·∇L
-```
-
-### Paramètres
-- **Learning rate** : 0.01 (plus petit que Batch)
-- **Époques** : 100
-- **Mises à jour** : 1470 par époque = **147,000 total**
-
-### Avantages
-✅ Convergence rapide (réagit immédiatement)  
-✅ Peut échapper aux minima locaux (grâce au bruit)  
-✅ Faible utilisation mémoire (1 exemple à la fois)  
-
-### Inconvénients
-❌ Convergence bruitée (zigzague beaucoup)  
-❌ Nécessite plus d'époques pour converger  
-
-### Résultat
-- **Fichier** : `weights_sgd.json`
-- **Précision** : >98% (équivalent à Batch)
-
----
-
-## ⚡ Bonus 2 : Mini-Batch - `logreg_train_minibatch.py`
-
-### Fonction
-Entraîne avec **Mini-Batch Gradient Descent** (mise à jour par groupes de 32-64 exemples).
-
-### Algorithme
-
-```
-Pour 100 époques :
-  1. Mélanger aléatoirement les exemples
-  2. Diviser en mini-batches de taille B (32-64)
-  3. Pour chaque mini-batch :
-     a. Calculer les prédictions sur le batch
-     b. Calculer le gradient moyen sur le batch
-     c. Mettre à jour : w = w - α·∇L_batch
-```
-
-### Paramètres
-- **Learning rate** : 0.1
-- **Époques** : 100
-- **Batch size** : 32-64 (configurable)
-- **Mises à jour** : ~23 par époque = **2,300 total**
-
-### Avantages
-✅ Meilleur compromis vitesse/stabilité  
-✅ Parallélisable sur GPU (calculs vectorisés)  
-✅ Convergence stable (moins de bruit que SGD)  
-✅ **Méthode standard en production**  
-
-### Résultat
-- **Fichier** : `weights_minibatch.json`
-- **Précision** : >98% (équivalent aux autres)
-
----
-
-## 📊 Bonus 3 : Comparaison - `compare_methods.py`
-
-### Fonction
-Compare les poids et caractéristiques des 3 algorithmes d'optimisation.
-
-### Sortie
-
-#### 1. Tableau comparatif
-| Critère | Batch GD | SGD | Mini-Batch |
-|---------|----------|-----|------------|
-| Mises à jour/époque | 1 | 1470 | ~23 |
-| Learning rate | 0.5 | 0.01 | 0.1 |
-| Total mises à jour | 1,000 | 147,000 | 2,300 |
-| Convergence | Lente stable | Rapide bruitée | Équilibrée |
-| Mémoire | Dataset complet | 1 exemple | 1 batch |
-| Précision | >98% | >98% | >98% |
-
-#### 2. Comparaison des poids
-Affiche les différences de poids apprises par chaque algorithme pour chaque feature.
-
-### Conclusion
-**Tous atteignent >98% de précision**, mais Mini-Batch est le meilleur compromis pour la production.
-
----
-
-## 🎬 Bonus 4 : Démonstration - `run_all_bonus.sh`
-
-### Fonction
-Script interactif qui lance tous les bonus séquentiellement avec des pauses explicatives.
-
-### Étapes
-1. Affiche les statistiques avancées (Range, Skewness, Kurtosis)
-2. Entraîne avec Batch GD
-3. Entraîne avec SGD
-4. Entraîne avec Mini-Batch GD
-5. Compare les 3 méthodes
-6. Génère les prédictions avec chaque méthode
-7. Affiche un résumé complet
-
-### Utilité
-Démo rapide de toutes les fonctionnalités bonus.
-
----
-
 ## 📐 Formules mathématiques clés
 
 ### Régression logistique (fonction sigmoïde)
@@ -491,22 +376,6 @@ $$\frac{\partial L}{\partial w_j} = \frac{1}{m} \sum_{i=1}^{m} (\hat{y}_i - y_i)
 
 ### Mise à jour des poids
 $$w_j := w_j - \alpha \frac{\partial L}{\partial w_j}$$
-
----
-
-## 🎯 Résumé des résultats
-
-| Script | Entrée | Sortie | Résultat clé |
-|--------|--------|--------|--------------|
-| **describe.py** | `dataset_train.csv` | Tableau stats | 12 stats × 13 features |
-| **histogram.py** | `dataset_train.csv` | Graphiques | Care of Magical Creatures = homogène |
-| **scatter_plot.py** | `dataset_train.csv` | Graphiques | Astronomy ↔ Defense (r=1.0) |
-| **pair_plot.py** | `dataset_train.csv` | Graphiques | Top 5 features identifiées |
-| **logreg_train.py** | `dataset_train.csv` | `weights.json` | >98% précision, 1000 updates |
-| **logreg_predict.py** | `dataset_test.csv` + `weights.json` | `houses.csv` + graphiques | 362/400 prédictions |
-| **logreg_train_sgd.py** | `dataset_train.csv` | `weights_sgd.json` | >98% précision, 147k updates |
-| **logreg_train_minibatch.py** | `dataset_train.csv` | `weights_minibatch.json` | >98% précision, 2.3k updates |
-| **compare_methods.py** | 3 fichiers weights | Tableau comparatif | Mini-Batch = meilleur compromis |
 
 ---
 
@@ -531,16 +400,6 @@ Pourquoi ? Éviter que les features avec grandes valeurs dominent le gradient.
 Contrôle la taille des pas lors de la descente de gradient :
 - Trop petit → convergence très lente
 - Trop grand → divergence (oscillations)
-- Batch GD : 0.5 (stable)
-- SGD : 0.01 (plus de bruit)
-- Mini-Batch : 0.1 (compromis)
-
-### Shuffle (mélange)
-Dans SGD et Mini-Batch, on mélange les exemples à chaque époque pour :
-- Éviter les biais d'ordre
-- Améliorer la généralisation
-- Réduire le sur-apprentissage
-
 ---
 
 ## 🔍 Analyse des performances
@@ -561,23 +420,3 @@ Seules les 5 features les plus discriminantes sont utilisées :
 
 → Réduit le sur-apprentissage et améliore la généralisation.
 
----
-
-## 💡 Recommandations
-
-### Pour l'entraînement
-- **Batch GD** : Petits datasets, besoin de stabilité maximale
-- **SGD** : Très gros datasets (millions), contraintes mémoire
-- **Mini-Batch** : **Recommandé** pour la plupart des cas (meilleur compromis)
-
-### Pour la production
-1. Utiliser Mini-Batch GD
-2. Batch size : 32-64 (sweet spot)
-3. Monitorer la convergence (log-loss)
-4. Sauvegarder les hyperparamètres (LR, epochs, batch size)
-
-### Améliorations possibles
-- Validation croisée (k-fold)
-- Régularisation L2 (éviter l'overfitting)
-- Grid search pour optimiser le learning rate
-- Tester d'autres features (combinaisons, transformations)
